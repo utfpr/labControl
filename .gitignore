@@ -1,0 +1,61 @@
+# ====================================================================
+# Node.js e Gerenciadores de Pacote
+# ====================================================================
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.pnpm-debug.log
+
+# ====================================================================
+# Compilação e Build (NestJS / TypeScript)
+# ====================================================================
+dist/
+build/
+out/
+.tsbuildinfo
+
+# ====================================================================
+# Variáveis de Ambiente e Segredos (CRÍTICO)
+# ====================================================================
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+*.pem
+
+# ====================================================================
+# Testes e Cobertura
+# ====================================================================
+coverage/
+.nyc_output/
+
+# ====================================================================
+# Logs e Banco de Dados Local
+# ====================================================================
+logs/
+*.log
+# Ignora possíveis pastas de mapeamento de volume do Postgres local
+pgdata/
+db-data/
+postgres-data/
+
+# ====================================================================
+# Ferramentas de SO e Editores de Código
+# ====================================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# ====================================================================
+# Ferramentas de Qualidade e Cache (ESLint, Prettier, etc)
+# ====================================================================
+.eslintcache
+.prettiercache
