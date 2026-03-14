@@ -1,0 +1,40 @@
+Definições das tecnologias do Backend: 
+
+1. Núcleo do Framework (NestJS & TS): O deve  utiliza o NestJS como base, configurado para rodar com Node.js 20+ e TypeScript.
+
+- Core: @nestjs/core, @nestjs/common, @nestjs/platform-express.
+- Configuração: @nestjs/config (gerenciamento de variáveis de ambiente).
+- TypeScript: typescript, ts-node, tsconfig-paths.
+- Utilitários: reflect-metadata, rxjs.
+- Gerenciador de pacotes: yarn.
+
+2. Banco de Dados & Persistência: A stack utiliza PostgreSQL com o padrão Data Mapper através do TypeORM.
+
+- ORM: typeorm, @nestjs/typeorm.
+- Driver: pg (PostgreSQL).
+- Naming: typeorm-naming-strategies (para converter camelCase para snake_case no banco).
+- Client: pgAdmin
+- Configuração Docker: Imagem supertokens/supertokens-postgresql integrada ao banco principal.
+
+4. Validação & Padronização de Dados: Essencial para garantir a integridade das entradas da API (DTOs).
+
+- Validação: class-validator, class-transformer.
+-Schema Validation: zod (usado para validar variáveis de ambiente ou payloads).
+- Datas: date-fns, date-fns-tz e moment.
+
+5. Comunicação & Documentação
+- API Docs: @nestjs/swagger (gera o Swagger UI automaticamente).
+- HTTP Client: @nestjs/axios e axios.
+- Relatórios/Scrapping: puppeteer (geração de PDFs ou automação de browser).
+
+6. Ferramentas de Qualidade (DevOps/DX): Para garantir que o código siga o padrão do projeto antes de chegar ao repositório.
+
+- Linting/Formatting: eslint, prettier, eslint-config-prettier.
+- Git Hooks: husky e lint-staged (roda lint/format automaticamente no commit).
+- Commits Padronizados: commitizen e cz-conventional-changelog.
+- Testes: jest, ts-jest, supertest.
+
+Configuração de Infraestrutura (Docker): Para replicar o ambiente, seu docker-compose.yml deve conter dois serviços principais:
+
+- App: Node.js rodando o NestJS.
+- Postgres: Banco de dados (imagem postgres:15-alpine).

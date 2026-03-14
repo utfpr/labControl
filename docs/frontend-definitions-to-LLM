@@ -1,0 +1,28 @@
+Definições das tecnologias do Frontend: 
+
+1. Framework Base e Ambiente: O projeto utiliza a versão mais recente do Next.js configurada para alta performance e flexibilidade de deploy.
+
+- Core: Next.js (configurado com suporte a output: standalone para Docker).
+- Linguagem: JavaScript com suporte a ESNext e mapeamento de caminhos via jsconfig.json.
+- Containerização: Docker com suporte a hot-reload em desenvolvimento via volumes mapeados.
+- Gerenciamento de pacotes: yarn.
+
+2. Organização de Código (Paths Aliases): Uma característica forte desta stack é o uso extensivo de Aliases para evitar caminhos relativos complexos (ex: ../../../). No novo projeto, configure seu jsconfig.json ou tsconfig.json com:
+
+- @/*: Raiz do código fonte (/src).
+- @core/*: Lógica de negócio e utilitários centrais.
+- @layouts/* e @menu/*: Estruturas de navegação e casca da aplicação.
+- @components/*: Componentes reutilizáveis de UI.
+- @views/*: Páginas e telas principais.
+
+3. Qualidade de Código e Padronização: O projeto possui regras de linting rigorosas para manter a consistência visual do código:
+
+- ESLint: Utiliza next/core-web-vitals e plugin:import/recommended para organizar importações.
+- Prettier: Integrado ao ESLint para formatação automática.
+* Regras Customizadas:
+- Import Order: Organiza automaticamente as importações (React primeiro, depois Next, depois internos).
+- Padding: Exige linhas em branco entre declarações de variáveis e funções para melhorar a legibilidade.
+
+4. Interface e Experiência do Usuário (UI/UX)
+- Estilização: Uso de Tailwind CSS.
+
