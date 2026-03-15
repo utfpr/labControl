@@ -1,6 +1,6 @@
 # Project: LabControl — Evolução de Tecnologia
 
-Este repositório contém a reengenharia e atualização de um sistema legado, adotando uma arquitetura de **Monorepo** e uma metodologia de desenvolvimento experimental baseada integralmente em IA.
+Este repositório contém a reengenharia e atualização de um sistema legado, adotando uma arquitetura de web e uma metodologia de desenvolvimento experimental baseada integralmente em IA.
 
 ## 🤖 Filosofia de Desenvolvimento: "AI-Only Implementation"
 
