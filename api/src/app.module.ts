@@ -7,6 +7,8 @@ import { UsuariosModule } from './modules/usuarios/usuarios.module';
 import { CursosModule } from './modules/cursos/cursos.module';
 import { LocaisModule } from './modules/locais/locais.module';
 import { EquipamentosModule } from './modules/equipamentos/equipamentos.module';
+import { DisciplinasModule } from './modules/disciplinas/disciplinas.module';
+import { AulasModule } from './modules/aulas/aulas.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { EquipamentosModule } from './modules/equipamentos/equipamentos.module';
     CursosModule,
     LocaisModule,
     EquipamentosModule,
+    DisciplinasModule,
+    AulasModule,
   ],
   controllers: [],
   providers: [],
