@@ -1,0 +1,22 @@
+O sistema controla reservas de equipamentos. Possui usuarios, locais, cursos, disciplinas, aulas, equipamentos e reservas.
+
+A tabela usuarios possui os seguintes campos: id, nome (vamos juntar no sistema antigo esta nome e sobrenome em campos separados), email, ra (um identificador numerico, geralmente com 7 ou mais digitos), curso (todo usuário é ligado a um curso, é chave estrangeira com id da tabela de cursos), e role (papel do usuário no sistema, são 3 papéis (role) de usuário: comum, supervisor e admin (apenas para rotinas administrativas do sistema).
+
+A tabela locais possui os seguintes campos: id, nome, curso (curso ao qual o local está associado, é chave estrangeira com id da tabela de cursos), descricao, supervisor (usuario responsavel pelo local, é chave estrangeira com id da tabela de usuarios).
+
+A tabela cursos possui os seguintes campos: id, nome, e supervisor. Cada usuário está ligado a um curso.
+
+A tabela disicplinas possui os seguintes campos: id, nome e responsável (usuario responsavel pela disciplina, é chave estrangeira com id da tabela de usuarios).
+
+A tabela equipamentos possui os seguintes campos: id, patrimonio, nome, curso (curso a que pertence, é chave estrangeira com id da tabela de cursos), local (local onde está o equipamento, é chave estrangeira com id da tabela de locais), status (com 3 possíveis estados: normal, quebrado ou em manutenção), marca, especificacao, e arquivo POP (um arquivo de procedimento operacional padrão, geralmente um pdf com o procedimento de uso do equipamento).
+
+A tabela aulas possui os seguintes campos: id, dispclina (chave estrangeira com id da tabela de disciplinas), data inicio, data fim, local (chave estrangeira com id da tabela locais), professor (responsavel pela disciplina, é chave estrangeira com id da tabela de usuarios), dia da semana (de 1 a 7, considerando 1 segundas e 7 domingos), horaInicio e horaFim.
+
+As reservas podem ser feitas de duas maneiras: um usuário pode reservar um equipamento específico ou um local.
+
+No caso de equipamentos, precisamos de um id para a reserva, o solicitante (chave estrangeira com id da tabela de usuarios),  o equipamento (chave estrangeira com id da tabela equipamentos), data e hora de inicio, data e hora de fim, e status (com 3 possíveis estados: pendente, confirmada, cancelada).
+
+No caso de locais precisamos de um id para a reserva, o solicitante (chave estrangeira com id da tabela de usuarios),  o local (chave estrangeira com id da tabela locais), data e hora de inicio, data e hora de fim, e status (com 3 possíveis estados: pendente, confirmada, cancelada).
+
+Em anexo uma exportação de um .json do antigo banco que estava em nosql (Firebase). Vamos modelar o banco novamente. Os dados podem ser uma guia inicial, mas vou listar algumas coisas do banco.
+
