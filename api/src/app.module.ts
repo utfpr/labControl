@@ -5,6 +5,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { HealthModule } from './health/health.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
 import { CursosModule } from './modules/cursos/cursos.module';
+import { LocaisModule } from './modules/locais/locais.module';
+import { EquipamentosModule } from './modules/equipamentos/equipamentos.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { CursosModule } from './modules/cursos/cursos.module';
     HealthModule,
     UsuariosModule,
     CursosModule,
+    LocaisModule,
+    EquipamentosModule,
   ],
   controllers: [],
   providers: [],
