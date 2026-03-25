@@ -41,3 +41,76 @@ O ciclo de vida de cada funcionalidade segue este fluxo:
 4. **Feedback Loop:** Em caso de erros, os logs são devolvidos à IA para diagnóstico e nova geração de código.
 
 ---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Node.js** (v20+)
+- **NestJS** (Framework backend)
+- **TypeORM** (ORM para modelagem relacional)
+- **PostgreSQL** (Banco de Dados)
+- **Docker & Docker Compose** (Infraestrutura)
+- **Swagger** (Documentação da API)
+
+## 📦 Pré-requisitos
+
+Para rodar este projeto, você precisará ter instalado em sua máquina:
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/) (Recomendado v20 LTS)
+- [Yarn](https://yarnpkg.com/)
+- [Docker](https://www.docker.com/) e Docker Compose
+
+## 🚀 Como Executar o Projeto
+
+**1. Clone o repositório e acesse a pasta da API:**
+\`\`\`bash
+git clone https://github.com/utfpr/labControl.git
+cd labControl/api
+\`\`\`
+
+**2. Instale as dependências locais:**
+\`\`\`bash
+yarn install
+\`\`\`
+
+**3. Suba a infraestrutura via Docker:**
+O comando abaixo irá baixar as imagens, compilar a aplicação e iniciar o Banco de Dados, o pgAdmin e a API em background.
+\`\`\`bash
+yarn services:up
+\`\`\`
+*(Nota: Este script executa `docker compose -f docker-compose.yml up -d`)*
+
+**4. Acompanhe os logs (Opcional):**
+\`\`\`bash
+yarn services:logs
+\`\`\`
+
+## 📍 Acessos Locais
+
+Com os containers rodando, os seguintes serviços estarão disponíveis:
+
+- **API:** [http://localhost:3000](http://localhost:3000)
+- **Swagger (Documentação e Testes):** [http://localhost:3000/docs](http://localhost:3000/docs)
+- **pgAdmin (Gerenciamento do BD):** [http://localhost:5050](http://localhost:5050)
+  - **Login:** `admin@admin.com`
+  - **Senha:** `admin`
+
+## 🏗️ Módulos Implementados
+
+Até o momento, a API contempla os seguintes módulos e relacionamentos:
+- **Usuários** (Relacionados a Cursos)
+- **Cursos** - **Locais** (Laboratórios - Relacionados a Cursos e Supervisores)
+- **Equipamentos** (Relacionados a Cursos e Locais)
+- **Disciplinas** (Relacionadas a Usuários responsáveis)
+- **Aulas** (Relacionadas a Disciplinas, Locais e Professores)
+
+## 🛑 Como Parar a Aplicação
+
+Para parar os containers sem perder os dados do banco:
+\`\`\`bash
+yarn services:down
+\`\`\`
+
+Para parar e **destruir** o banco de dados (zerar o sistema):
+\`\`\`bash
+yarn services:down -v
+\`\`\`
