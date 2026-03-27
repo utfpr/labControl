@@ -15,3 +15,11 @@ export enum ReservaStatus {
   CONFIRMADA = 'confirmada',
   CANCELADA = 'cancelada',
 }
+
+export enum Status {
+  PENDENTE = 'pendente',
+  APROVADA = 'aprovada',
+  REJEITADA = 'rejeitada',
+  CANCELADA = 'cancelada',
+  FINALIZADA = 'finalizada',
+}

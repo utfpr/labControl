@@ -9,7 +9,8 @@ import { LocaisModule } from './modules/locais/locais.module';
 import { EquipamentosModule } from './modules/equipamentos/equipamentos.module';
 import { DisciplinasModule } from './modules/disciplinas/disciplinas.module';
 import { AulasModule } from './modules/aulas/aulas.module';
-
+import { ReservasLocaisModule } from './modules/reservas-locais/reservas-locais.module';
+import { ReservasEquipamentosModule } from './modules/reservas-equipamentos/reservas-equipamentos.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -43,6 +44,8 @@ import { AulasModule } from './modules/aulas/aulas.module';
     EquipamentosModule,
     DisciplinasModule,
     AulasModule,
+    ReservasLocaisModule,
+    ReservasEquipamentosModule,
   ],
   controllers: [],
   providers: [],
