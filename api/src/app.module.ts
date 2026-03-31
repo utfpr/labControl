@@ -11,6 +11,7 @@ import { DisciplinasModule } from './modules/disciplinas/disciplinas.module';
 import { AulasModule } from './modules/aulas/aulas.module';
 import { ReservasLocaisModule } from './modules/reservas-locais/reservas-locais.module';
 import { ReservasEquipamentosModule } from './modules/reservas-equipamentos/reservas-equipamentos.module';
+import { AuthModule } from './modules/auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -46,6 +47,7 @@ import { ReservasEquipamentosModule } from './modules/reservas-equipamentos/rese
     AulasModule,
     ReservasLocaisModule,
     ReservasEquipamentosModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

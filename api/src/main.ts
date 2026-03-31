@@ -23,6 +23,7 @@ async function bootstrap() {
     .setTitle('API Documentation')
     .setDescription('Documentação da API do sistema (Legacy Evolution)')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
