@@ -20,7 +20,7 @@ O sistema está organizado para suportar múltiplos pacotes e serviços de forma
 
 ```text
 /
-├── backend/       # API, Regras de Negócio e Persistência de Dados
+├── api/           # Backend, API, Regras de Negócio e Persistência de Dados
 ├── frontend/      # Interface de Usuário e Experiência do Cliente
 └── docs/          # Histórico de prompts e documentação técnica
 
