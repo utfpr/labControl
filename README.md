@@ -28,7 +28,7 @@ O sistema está organizado para suportar múltiplos pacotes e serviços de forma
 
 ### Detalhamento das Camadas:
 
-* **`backend/`**: Responsável por toda a lógica de servidor, integração com banco de dados e exposição de endpoints. Seguindo a premissa do projeto, toda a arquitetura (REST, GraphQL, ou Microservices) será definida via instruções de IA.
+* **`api/`**: Responsável por toda a lógica de servidor, integração com banco de dados e exposição de endpoints. Seguindo a premissa do projeto, toda a arquitetura (REST, GraphQL, ou Microservices) será definida via instruções de IA.
 * **`frontend/`**: Contém a aplicação cliente. A escolha de frameworks, componentes e gerenciamento de estado será estritamente baseada nos questionamentos e respostas obtidos durante o desenvolvimento.
 
 ## 🚀 Fluxo de Trabalho
