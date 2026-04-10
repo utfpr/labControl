@@ -19,6 +19,7 @@ export class EquipamentosController {
   constructor(private readonly equipamentosService: EquipamentosService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Cria um novo equipamento (Admin/Supervisor)' })
   async criar(@Body() dados: CriarEquipamentoDto) {
