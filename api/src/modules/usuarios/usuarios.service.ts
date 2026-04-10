@@ -1,34 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
-import { CriarUsuarioDto } from './dto/criar-usuario.dto';
 
 @Injectable()
 export class UsuariosService {
   constructor(
     @InjectRepository(Usuario)
-    private usuariosRepository: Repository<Usuario>,
+    private usuarioRepository: Repository<Usuario>,
   ) {}
 
-  async criar(dados: CriarUsuarioDto): Promise<Usuario> {
-    // Extraímos o cursoId e guardamos o resto das propriedades em dadosUsuario
-    const { cursoId, ...dadosUsuario } = dados;
-
-    // O TypeORM entende que passar { id: cursoId } na propriedade 'curso'
-    // fará a ligação correta da chave estrangeira (curso_id) no banco
-    const novoUsuario = this.usuariosRepository.create({
-      ...dadosUsuario,
-      curso: { id: cursoId },
+  // 👇 Rota 1: Traz apenas os inativos (Fila de espera)
+  async listarPendentes(): Promise<Partial<Usuario>[]> {
+    return await this.usuarioRepository.find({
+      where: { ativo: false },
+      // Segurança: Filtramos para não devolver a senha para o front-end
+      select: ['id', 'nome', 'email', 'ra', 'role', 'comprovanteMatricula', 'createdAt'],
+      relations: ['curso'], // Traz os dados do curso que a pessoa escolheu
     });
-
-    return await this.usuariosRepository.save(novoUsuario);
   }
 
-  async listarTodos(): Promise<Usuario[]> {
-    // O relations avisa o TypeORM para trazer os dados da tabela Cursos junto
-    return await this.usuariosRepository.find({
-      relations: ['curso'],
-    });
+  // 👇 Rota 2: Vira a chave "ativo" para true
+  async aprovar(id: string): Promise<{ mensagem: string }> {
+    const usuario = await this.usuarioRepository.findOneBy({ id });
+    
+    if (!usuario) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    if (usuario.ativo) {
+      return { mensagem: 'Este usuário já está aprovado.' };
+    }
+
+    usuario.ativo = true;
+    await this.usuarioRepository.save(usuario);
+
+    return { mensagem: `Usuário ${usuario.nome} aprovado com sucesso e liberado para login!` };
   }
 }

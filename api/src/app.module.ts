@@ -12,6 +12,7 @@ import { AulasModule } from './modules/aulas/aulas.module';
 import { ReservasLocaisModule } from './modules/reservas-locais/reservas-locais.module';
 import { ReservasEquipamentosModule } from './modules/reservas-equipamentos/reservas-equipamentos.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { SeedModule } from './seed/seed.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -48,6 +49,7 @@ import { AuthModule } from './modules/auth/auth.module';
     ReservasLocaisModule,
     ReservasEquipamentosModule,
     AuthModule,
+    SeedModule,
   ],
   controllers: [],
   providers: [],

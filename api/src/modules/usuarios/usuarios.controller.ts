@@ -1,23 +1,30 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Patch, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { UsuariosService } from './usuarios.service';
-import { CriarUsuarioDto } from './dto/criar-usuario.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../../common/enums';
 
-@ApiTags('Usuarios')
+@ApiTags('Usuários')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Cria um novo usuário' })
-  @ApiBody({ type: CriarUsuarioDto }) // Força o Swagger a ler a nossa classe DTO
-  async criar(@Body() dados: CriarUsuarioDto) {
-    return this.usuariosService.criar(dados);
+  @Get('pendentes')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Lista todos os usuários aguardando aprovação (Apenas Admin)' })
+  async listarPendentes() {
+    return this.usuariosService.listarPendentes();
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Lista todos os usuários' })
-  async listarTodos() {
-    return this.usuariosService.listarTodos();
+  @Patch(':id/aprovar')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Aprova o cadastro de um usuário (Apenas Admin)' })
+  @ApiParam({ name: 'id', description: 'ID do Usuário que será aprovado' })
+  async aprovar(@Param('id') id: string) {
+    return this.usuariosService.aprovar(id);
   }
 }

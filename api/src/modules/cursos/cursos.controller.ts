@@ -8,21 +8,20 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../common/enums';
 
 @ApiTags('Cursos')
-@ApiBearerAuth() // 👈 Avisa o Swagger que este Controller inteiro exige o Cadeado
-@UseGuards(JwtAuthGuard, RolesGuard) // 👈 Coloca os dois guarda-costas na porta do Controller
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('cursos')
 export class CursosController {
   constructor(private readonly cursosService: CursosService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN) // 👈 ETIQUETA: Apenas Admins podem executar o POST!
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Cria um novo curso (Apenas Admin)' })
   async criar(@Body() dados: CriarCursoDto) {
     return this.cursosService.criar(dados);
   }
 
   @Get()
-  // 👈 Como não tem a etiqueta @Roles aqui, qualquer usuário logado com token válido pode dar GET
   @ApiOperation({ summary: 'Lista todos os cursos (Requer Login)' })
   async listarTodos() {
     return this.cursosService.listarTodos();

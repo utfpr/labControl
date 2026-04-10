@@ -10,7 +10,7 @@ export class ReservasLocaisService {
   constructor(
     @InjectRepository(ReservaLocal)
     private reservasLocaisRepository: Repository<ReservaLocal>,
-    private dataSource: DataSource, // 👈 Injetamos a conexão raiz para acessar outras tabelas livremente
+    private dataSource: DataSource,
   ) {}
 
   async criar(dados: any): Promise<ReservaLocal> {
