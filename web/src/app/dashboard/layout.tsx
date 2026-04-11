@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes"; // 👈 Hook do tema
-import { 
-  Home, CalendarDays, Monitor, MapPin, 
+import {
+  Home, CalendarDays, Monitor, MapPin,
   GraduationCap, BookOpen, Menu, User, LogOut,
   Sun, Moon // 👈 Ícones de Sol e Lua
 } from "lucide-react";
@@ -14,13 +14,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const [menuAberto, setMenuAberto] = useState(false);
-  
+
   // Controle do Tema
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Evita erro de hidratação (garante que o botão só renderiza no cliente)
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   const menus = [
     { nome: "Home", href: "/dashboard", icone: Home },
@@ -37,24 +40,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    // 👈 Adicionamos classes dark:bg-slate-900 para o fundo mudar no modo escuro
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 overflow-hidden">
-      
       {/* Barra Lateral (Sidebar) */}
       <aside className={`bg-[#0f172a] text-slate-300 w-64 flex-shrink-0 flex flex-col transition-transform absolute inset-y-0 left-0 md:relative md:translate-x-0 z-50 ${menuAberto ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-16 flex items-center px-6 bg-[#0b1120] font-bold text-xl text-white tracking-wider border-b border-slate-800 flex-shrink-0">
           <span className="text-blue-500 mr-2">UTF</span>PR
         </div>
-        
+
         <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
           {menus.map((menu) => {
             const ativo = pathname === menu.href;
             const Icone = menu.icone;
             return (
               <Link key={menu.nome} href={menu.href}
-                className={`flex items-center px-3 py-2.5 rounded-lg transition-colors ${
-                  ativo ? "bg-blue-600 text-white font-medium shadow-sm" : "hover:bg-slate-800 hover:text-white"
-                }`}
+                className={`flex items-center px-3 py-2.5 rounded-lg transition-colors ${ativo ? "bg-blue-600 text-white font-medium shadow-sm" : "hover:bg-slate-800 hover:text-white"
+                  }`}
               >
                 <Icone className="w-5 h-5 mr-3" />
                 {menu.nome}
@@ -99,7 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button onClick={() => setMenuAberto(!menuAberto)} className="md:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
             <Menu className="w-5 h-5" />
           </button>
-          
+
           <div className="flex-1" />
 
           <div className="flex items-center gap-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Activity, AlertCircle, Wrench, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 
 export default function DashboardPage() {
   return (

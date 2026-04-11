@@ -34,21 +34,23 @@ export default function LoginPage() {
 
       // Sucesso! Salvamos o token no navegador
       localStorage.setItem("labcontrol_token", data.access_token);
-      
+
       // Redirecionamos o usuário para a rota protegida
       router.push("/dashboard");
-      
-    } catch (err: any) {
-      setErro(err.message);
-    } finally {
-      setLoading(false);
+
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErro(err.message);
+      } else {
+        setErro("Ocorreu um erro inesperado.");
+      }
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">LabControl</h1>
           <p className="text-gray-500">Entre com suas credenciais para acessar</p>
