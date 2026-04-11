@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Local } from '../entities/local.entity';
-import { CriarLocalDto } from './dto/criar-local.dto';
+import { Local } from '../entities/local.entity'; // Verifique o caminho da sua entidade
 
 @Injectable()
 export class LocaisService {
@@ -11,22 +10,36 @@ export class LocaisService {
     private locaisRepository: Repository<Local>,
   ) {}
 
-  async criar(dados: CriarLocalDto): Promise<Local> {
-    const { cursoId, supervisorId, ...dadosLocal } = dados;
-
+  async criar(dados: any): Promise<Local> {
     const novoLocal = this.locaisRepository.create({
-      ...dadosLocal,
-      curso: { id: cursoId },
-      supervisor: { id: supervisorId },
+      nome: dados.nome,
+      descricao: dados.descricao,
     });
 
     return await this.locaisRepository.save(novoLocal);
   }
 
   async listarTodos(): Promise<Local[]> {
-    // Traz o local já preenchido com os dados do curso e do supervisor!
     return await this.locaisRepository.find({
-      relations: ['curso', 'supervisor'],
+      order: { nome: 'ASC' } // Lista em ordem alfabética (ex: C001, C005, C105...)
     });
+  }
+
+  async atualizar(id: string, dados: any): Promise<Local> {
+    const local = await this.locaisRepository.findOneBy({ id });
+    
+    if (!local) throw new NotFoundException('Local não encontrado.');
+
+    if (dados.nome) local.nome = dados.nome;
+    if (dados.descricao !== undefined) local.descricao = dados.descricao;
+
+    return await this.locaisRepository.save(local);
+  }
+
+  async remover(id: string): Promise<void> {
+    const local = await this.locaisRepository.findOneBy({ id });
+    if (!local) throw new NotFoundException('Local não encontrado.');
+    
+    await this.locaisRepository.remove(local);
   }
 }
