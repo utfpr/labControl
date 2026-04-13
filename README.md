@@ -29,7 +29,7 @@ O sistema está organizado para suportar múltiplos pacotes e serviços de forma
 ### Detalhamento das Camadas:
 
 * **`api/`**: Responsável por toda a lógica de servidor, integração com banco de dados e exposição de endpoints. Seguindo a premissa do projeto, toda a arquitetura (REST, GraphQL, ou Microservices) será definida via instruções de IA.
-* **`frontend/`**: Contém a aplicação cliente. A escolha de frameworks, componentes e gerenciamento de estado será estritamente baseada nos questionamentos e respostas obtidos durante o desenvolvimento.
+* **`web/`**: Contém a aplicação cliente. A escolha de frameworks, componentes e gerenciamento de estado será estritamente baseada nos questionamentos e respostas obtidos durante o desenvolvimento.
 
 ## 🚀 Fluxo de Trabalho
 
@@ -75,7 +75,7 @@ yarn install
 **3. Suba a infraestrutura via Docker:**
 O comando abaixo irá baixar as imagens, compilar a aplicação e iniciar o Banco de Dados, o pgAdmin e a API em background.
 \`\`\`bash
-yarn services:up
+yarn services:api
 \`\`\`
 *(Nota: Este script executa `docker compose -f docker-compose.yml up -d`)*
 
@@ -112,5 +112,5 @@ yarn services:down
 
 Para parar e **destruir** o banco de dados (zerar o sistema):
 \`\`\`bash
-yarn services:down -v
+yarn services:clean
 \`\`\`
