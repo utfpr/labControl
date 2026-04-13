@@ -9,25 +9,26 @@ export class Usuario {
   id: string;
 
   @Column()
-  nome: string; // Nome completo do usuário
+  nome: string; 
 
   @Column({ unique: true })
-  ra: string; // Registro Acadêmico / Matrícula
+  ra: string; 
 
   @Column({ unique: true })
   email: string;
 
   @Column()
-  senha: string; // O banco guardará apenas o Hash gerado pelo bcrypt
+  senha: string; 
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.COMUM })
   role: UserRole;
 
-  @Column({ default: false })
-  ativo: boolean; // Flag de segurança: Inicia falso até ser aprovado
+  // 👇 SUBSTITUÍMOS O 'ATIVO' PELO 'STATUS'
+  @Column({ default: 'PENDENTE' })
+  status: string; // Pode ser: 'PENDENTE', 'ATIVO' ou 'BLOQUEADO'
 
   @Column({ nullable: true })
-  comprovanteMatricula: string; // Caminho do PDF salvo no servidor
+  comprovanteMatricula: string; 
 
   @ManyToOne(() => Curso, (curso) => curso.usuarios, { nullable: true })
   curso: Curso;
@@ -38,7 +39,6 @@ export class Usuario {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // Gatilho Automático: Criptografa a senha antes de inserir no banco
   @BeforeInsert()
   async hashPassword() {
     if (this.senha) {

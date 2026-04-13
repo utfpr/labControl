@@ -7,26 +7,30 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../common/enums';
 
 @ApiTags('Cursos')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+// ❌ REMOVA O @UseGuards E O @ApiBearerAuth DAQUI DE CIMA!
 @Controller('cursos')
 export class CursosController {
   constructor(private readonly cursosService: CursosService) {}
 
   @Post()
+  @ApiBearerAuth() // 👈 Coloque a proteção apenas aqui
+  @UseGuards(JwtAuthGuard, RolesGuard) // 👈 Coloque a proteção apenas aqui
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Cria um novo curso' })
   async criar(@Body() dados: any) {
     return this.cursosService.criar(dados);
   }
 
+  // 👇 Esta rota agora está 100% livre para a tela de Registro!
   @Get()
-  @ApiOperation({ summary: 'Lista todos os cursos' })
+  @ApiOperation({ summary: 'Lista todos os cursos (Público)' })
   async listarTodos() {
     return this.cursosService.listarTodos();
   }
 
   @Patch(':id')
+  @ApiBearerAuth() // 👈 Coloque a proteção apenas aqui
+  @UseGuards(JwtAuthGuard, RolesGuard) // 👈 Coloque a proteção apenas aqui
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Edita um curso existente' })
   async atualizar(@Param('id') id: string, @Body() dados: any) {
@@ -34,6 +38,8 @@ export class CursosController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth() // 👈 Coloque a proteção apenas aqui
+  @UseGuards(JwtAuthGuard, RolesGuard) // 👈 Coloque a proteção apenas aqui
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Remove um curso' })
   async remover(@Param('id') id: string) {

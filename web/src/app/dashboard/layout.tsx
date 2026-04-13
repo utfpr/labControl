@@ -7,7 +7,7 @@ import { useTheme } from "next-themes"; // 👈 Hook do tema
 import {
   Home, CalendarDays, Monitor, MapPin,
   GraduationCap, BookOpen, Menu, User, LogOut,
-  Sun, Moon // 👈 Ícones de Sol e Lua
+  Sun, Moon, Users
 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -32,6 +32,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { nome: "Locais", href: "/dashboard/locais", icone: MapPin },
     { nome: "Aulas", href: "/dashboard/aulas", icone: GraduationCap },
     { nome: "Cursos", href: "/dashboard/cursos", icone: BookOpen },
+    { nome: "Usuários", href: "/dashboard/usuarios", icone: Users },
   ];
 
   const handleLogout = () => {

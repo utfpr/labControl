@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsuariosController } from './usuarios.controller';
 import { UsuariosService } from './usuarios.service';
-import { Usuario } from '../entities/usuario.entity'; // Verifique se o caminho bate com a sua estrutura
+import { UsuariosController } from './usuarios.controller';
+import { Usuario } from '../entities/usuario.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Usuario])], // <-- Isso libera o Repositório!
+  imports: [TypeOrmModule.forFeature([Usuario])],
   controllers: [UsuariosController],
   providers: [UsuariosService],
+  exports: [UsuariosService],
 })
-export class UsuariosModule {}
+export class UsuariosModule { }
