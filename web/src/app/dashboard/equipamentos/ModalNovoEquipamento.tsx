@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { X, Upload, FileText } from "lucide-react";
 
+// 👇 Configuração Global de Upload para Equipamentos
+const MAX_UPLOAD_MB = 5;
+const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
+
 interface EquipamentoData {
   id: string;
   nome: string;
@@ -16,7 +20,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  equipamento?: EquipamentoData | null; // 👈 Saiu o "any"
+  equipamento?: EquipamentoData | null;
 }
 
 export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equipamento }: ModalProps) {
@@ -26,14 +30,15 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
   const [status, setStatus] = useState("normal");
   const [cursoId, setCursoId] = useState("");
   const [localId, setLocalId] = useState("");
+  
   const [cursos, setCursos] = useState<{ id: string; nome: string }[]>([]);
   const [locais, setLocais] = useState<{ id: string; nome: string }[]>([]);
+  
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
 
   useEffect(() => {
     if (isOpen) {
-      // Busca as listas
       const fetchDependencias = async () => {
         const token = localStorage.getItem("labcontrol_token");
         try {
@@ -49,7 +54,6 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
       };
       fetchDependencias();
 
-      // Se for edição, preenche o formulário
       if (equipamento) {
         setNome(equipamento.nome);
         setPatrimonio(equipamento.patrimonio);
@@ -58,7 +62,6 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
         setLocalId(equipamento.local?.id || "");
       }
     } else {
-      // Limpa os dados quando fecha
       setNome("");
       setPatrimonio("");
       setStatus("normal");
@@ -84,6 +87,7 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
 
     try {
       const token = localStorage.getItem("labcontrol_token");
+      
       const formData = new FormData();
       formData.append("nome", nome);
       formData.append("patrimonio", patrimonio);
@@ -91,9 +95,10 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
       formData.append("cursoId", cursoId);
       formData.append("localId", localId);
 
-      if (arquivo) formData.append("file", arquivo);
+      if (arquivo) {
+        formData.append("file", arquivo);
+      }
 
-      // Lógica crucial: Se tem id, é edição (PATCH). Se não, é criação (POST)
       const url = equipamento
         ? `http://localhost:3000/equipamentos/${equipamento.id}`
         : `http://localhost:3000/equipamentos`;
@@ -102,7 +107,9 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
 
       const response = await fetch(url, {
         method: method,
-        headers: { "Authorization": `Bearer ${token}` },
+        headers: { 
+          "Authorization": `Bearer ${token}` 
+        },
         body: formData,
       });
 
@@ -114,7 +121,7 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
       }
 
       onSuccess();
-    } catch (err: unknown) { // 👈 Saiu o "any", entrou o "unknown"
+    } catch (err: unknown) { 
       if (err instanceof Error) {
         setErro(err.message);
       } else {
@@ -177,22 +184,47 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Substituir POP (Opcional)</label>
-            <label className="flex flex-col items-center justify-center w-full h-20 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+            {/* 👇 Label agora utiliza a constante para se atualizar automaticamente */}
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              {equipamento ? `Substituir POP (Opcional, Máx: ${MAX_UPLOAD_MB}MB)` : `Anexar POP (Opcional, Máx: ${MAX_UPLOAD_MB}MB)`}
+            </label>
+            <label className="flex flex-col items-center justify-center w-full h-20 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 {arquivo ? (
-                  <p className="text-sm font-medium text-blue-500"><FileText className="inline w-4 h-4 mr-1" /> {arquivo.name}</p>
+                  <p className="text-sm font-medium text-blue-500 truncate max-w-[200px]">
+                    <FileText className="inline w-4 h-4 mr-1" /> {arquivo.name}
+                  </p>
                 ) : (
-                  <p className="text-sm text-slate-500"><Upload className="inline w-4 h-4 mr-1" /> Clique para novo PDF</p>
+                  <p className="text-sm text-slate-500">
+                    <Upload className="inline w-4 h-4 mr-1" /> Clique para inserir arquivo PDF
+                  </p>
                 )}
               </div>
-              <input type="file" className="hidden" accept=".pdf" onChange={(e) => { if (e.target.files?.[0]) setArquivo(e.target.files[0]); }} />
+              <input 
+                type="file" 
+                className="hidden" 
+                accept=".pdf" 
+                onChange={(e) => { 
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > MAX_UPLOAD_BYTES) {
+                      setErro(`O arquivo POP deve ter no máximo ${MAX_UPLOAD_MB}MB.`);
+                      setArquivo(null);
+                    } else {
+                      setErro("");
+                      setArquivo(file);
+                    }
+                  }
+                }} 
+              />
             </label>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <button type="button" onClick={onClose} disabled={loading} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">Cancelar</button>
-            <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-70">
+            <button type="button" onClick={onClose} disabled={loading} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-70 transition-colors">
               {loading ? "Salvando..." : "Salvar"}
             </button>
           </div>

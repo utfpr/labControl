@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Monitor, Pencil, Trash2, AlertCircle } from "lucide-react";
+import { Plus, Monitor, Pencil, Trash2, AlertCircle, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ModalNovoEquipamento from "./ModalNovoEquipamento";
 import ModalConfirmacao from "./ModalConfirmacao";
@@ -21,14 +21,16 @@ export default function EquipamentosPage() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
-  // Controle do Modal de Cadastro/Edição
   const [modalAberto, setModalAberto] = useState(false);
   const [equipamentoEditando, setEquipamentoEditando] = useState<Equipamento | null>(null);
 
-  // Controle do Modal de Exclusão
   const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
   const [equipamentoSelecionado, setEquipamentoSelecionado] = useState<{ id: string, nome: string } | null>(null);
   const [excluindo, setExcluindo] = useState(false);
+
+  // Controle do Modal de Aviso (Para quando o POP não existe)
+  const [modalInfoAberto, setModalInfoAberto] = useState(false);
+  const [modalInfoProps, setModalInfoProps] = useState({ titulo: "", msg: "" });
 
   const router = useRouter();
 
@@ -49,9 +51,7 @@ export default function EquipamentosPage() {
       const data = await response.json();
       setEquipamentos(data);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setErro(err.message);
-      }
+      if (err instanceof Error) setErro(err.message);
     } finally {
       setLoading(false);
     }
@@ -72,6 +72,19 @@ export default function EquipamentosPage() {
     setModalAberto(true);
   };
 
+  // Função para abrir o arquivo ou exibir o alerta
+  const baixarPop = (path?: string) => {
+    if (!path || path === "null" || path.trim() === "") {
+      setModalInfoProps({
+        titulo: "POP não disponível",
+        msg: "Este equipamento ainda não possui um Procedimento Operacional Padrão cadastrado em sua ficha."
+      });
+      setModalInfoAberto(true);
+      return;
+    }
+    window.open(`http://localhost:3000/${path.replace(/\\/g, '/')}`, '_blank');
+  };
+
   const confirmarExclusao = async () => {
     if (!equipamentoSelecionado) return;
 
@@ -85,14 +98,11 @@ export default function EquipamentosPage() {
 
       if (!response.ok) throw new Error("Erro ao excluir equipamento");
 
-      // Fecha o modal, limpa a seleção e recarrega a lista
       setModalExclusaoAberto(false);
       setEquipamentoSelecionado(null);
       buscarEquipamentos();
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
+      if (error instanceof Error) alert(error.message);
     } finally {
       setExcluindo(false);
     }
@@ -101,7 +111,6 @@ export default function EquipamentosPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
 
-      {/* Cabeçalho */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -114,7 +123,6 @@ export default function EquipamentosPage() {
         </button>
       </div>
 
-      {/* Tabela */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-slate-500"><div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>Carregando...</div>
@@ -130,6 +138,7 @@ export default function EquipamentosPage() {
                   <th className="p-4 font-semibold">Patrimônio</th>
                   <th className="p-4 font-semibold">Nome</th>
                   <th className="p-4 font-semibold">Local</th>
+                  <th className="p-4 font-semibold text-center">POP</th>
                   <th className="p-4 font-semibold">Status</th>
                   <th className="p-4 font-semibold text-right">Ações</th>
                 </tr>
@@ -139,7 +148,25 @@ export default function EquipamentosPage() {
                   <tr key={eq.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="p-4 text-sm text-slate-600 dark:text-slate-300">{eq.patrimonio}</td>
                     <td className="p-4 text-sm font-semibold text-slate-800 dark:text-white">{eq.nome}</td>
-                    <td className="p-4 text-sm text-slate-600 dark:text-slate-400">{eq.local?.nome}</td>
+                    <td className="p-4 text-sm text-slate-600 dark:text-slate-400">{eq.local?.nome || "-"}</td>
+                    
+                    {/* Coluna do POP */}
+                    <td className="p-4 text-center">
+                      {eq.arquivoPop ? (
+                        <button 
+                          onClick={() => baixarPop(eq.arquivoPop)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded transition-colors"
+                          title="Baixar Procedimento (PDF)"
+                        >
+                          <FileText className="w-5 h-5" />
+                        </button>
+                      ) : (
+                        <span className="p-1.5 text-slate-300 dark:text-slate-600 inline-block" title="POP não disponível">
+                          <FileText className="w-5 h-5 opacity-50" />
+                        </span>
+                      )}
+                    </td>
+
                     <td className="p-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${eq.status === 'normal' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                         eq.status === 'quebrado' ? 'bg-red-50 text-red-700 border-red-200' :
@@ -150,7 +177,6 @@ export default function EquipamentosPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        {/* Botão Editar */}
                         <button
                           onClick={() => abrirModalEditar(eq)}
                           className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded transition-colors"
@@ -159,7 +185,6 @@ export default function EquipamentosPage() {
                           <Pencil className="w-4 h-4" />
                         </button>
 
-                        {/* Botão Excluir (Agora abre o Modal) */}
                         <button
                           onClick={() => {
                             setEquipamentoSelecionado({ id: eq.id, nome: eq.nome });
@@ -180,18 +205,13 @@ export default function EquipamentosPage() {
         )}
       </div>
 
-      {/* Modal de Cadastro/Edição */}
       <ModalNovoEquipamento
         isOpen={modalAberto}
         onClose={() => setModalAberto(false)}
-        onSuccess={() => {
-          setModalAberto(false);
-          buscarEquipamentos();
-        }}
+        onSuccess={() => { setModalAberto(false); buscarEquipamentos(); }}
         equipamento={equipamentoEditando}
       />
 
-      {/* Novo Modal de Exclusão */}
       <ModalConfirmacao
         isOpen={modalExclusaoAberto}
         onClose={() => setModalExclusaoAberto(false)}
@@ -199,6 +219,19 @@ export default function EquipamentosPage() {
         titulo="Excluir Equipamento"
         mensagem={`Atenção! Você tem certeza que deseja excluir o equipamento "${equipamentoSelecionado?.nome}"? Esta ação não poderá ser desfeita.`}
         loading={excluindo}
+        textoBotao="Sim, Excluir"
+        tipo="danger"
+      />
+
+      {/* Modal de Aviso para POP Inexistente */}
+      <ModalConfirmacao
+        isOpen={modalInfoAberto}
+        onClose={() => setModalInfoAberto(false)}
+        onConfirm={() => setModalInfoAberto(false)}
+        titulo={modalInfoProps.titulo}
+        mensagem={modalInfoProps.msg}
+        textoBotao="Entendi"
+        tipo="info"
       />
     </div>
   );

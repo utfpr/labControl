@@ -15,6 +15,8 @@ export class EquipamentosService {
       nome: dados.nome,
       patrimonio: dados.patrimonio,
       status: dados.status || 'normal',
+      marca: dados.marca,
+      especificacao: dados.especificacao,
       arquivoPop: caminhoArquivoPop,
     });
 
@@ -27,7 +29,7 @@ export class EquipamentosService {
   async listarTodos(): Promise<Equipamento[]> {
     return await this.equipamentosRepository.find({
       relations: ['curso', 'local'],
-      order: { createdAt: 'DESC' } // Mostra os mais recentes primeiro
+      order: { createdAt: 'DESC' } 
     });
   }
 
@@ -36,10 +38,14 @@ export class EquipamentosService {
 
     if (!equipamento) throw new NotFoundException('Equipamento não encontrado.');
 
-    // Atualiza apenas os campos que vieram na requisição
-    if (dados.nome) equipamento.nome = dados.nome;
-    if (dados.patrimonio) equipamento.patrimonio = dados.patrimonio;
-    if (dados.status) equipamento.status = dados.status;
+    // Atualiza com segurança os campos presentes
+    if (dados.nome !== undefined) equipamento.nome = dados.nome;
+    if (dados.patrimonio !== undefined) equipamento.patrimonio = dados.patrimonio;
+    if (dados.status !== undefined) equipamento.status = dados.status;
+    if (dados.marca !== undefined) equipamento.marca = dados.marca;
+    if (dados.especificacao !== undefined) equipamento.especificacao = dados.especificacao;
+    
+    // Se enviou um novo arquivo, sobrescreve o caminho
     if (caminhoArquivoPop) equipamento.arquivoPop = caminhoArquivoPop;
 
     if (dados.cursoId) equipamento.curso = { id: dados.cursoId } as any;

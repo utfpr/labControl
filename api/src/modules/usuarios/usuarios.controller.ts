@@ -10,8 +10,11 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../common/enums';
 
+// 👇 Constantes de configuração preparadas para uso futuro com .env
+const MAX_FILE_SIZE_MB = 1;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 const multerComprovanteConfig = {
-  // ... (mantenha sua configuração exata do multer aqui)
   storage: diskStorage({
     destination: (req, file, cb) => {
       const uploadPath = './uploads/comprovantes';
@@ -27,6 +30,9 @@ const multerComprovanteConfig = {
     if (file.mimetype === 'application/pdf') cb(null, true);
     else cb(new BadRequestException('Apenas arquivos PDF são permitidos!'), false);
   },
+  limits: {
+    fileSize: MAX_FILE_SIZE_BYTES // Aplica a constante
+  }
 };
 
 @ApiTags('Usuários')
@@ -39,7 +45,7 @@ export class UsuariosController {
   @ApiOperation({ summary: 'Registra um novo usuário (Público)' })
   @ApiConsumes('multipart/form-data')
   async registrar(@Body() dados: any, @UploadedFile() file: any) {
-    if (!file) throw new BadRequestException('O comprovante é obrigatório.');
+    if (!file) throw new BadRequestException(`O comprovante é obrigatório e deve ter no máximo ${MAX_FILE_SIZE_MB}MB.`);
     return this.usuariosService.registrar(dados, file.path);
   }
 

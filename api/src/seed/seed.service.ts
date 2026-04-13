@@ -5,7 +5,7 @@ import { Usuario } from '../modules/entities/usuario.entity';
 import { Curso } from '../modules/entities/curso.entity';
 import { Local } from '../modules/entities/local.entity';
 import { Equipamento } from '../modules/entities/equipamento.entity';
-import { UserRole } from '../common/enums'; // Ajuste o caminho se necessário
+import { UserRole } from '../common/enums';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -30,7 +30,7 @@ export class SeedService implements OnApplicationBootstrap {
 
     this.logger.log('Banco vazio detectado! Plantando os dados de teste...');
 
- // 1. Criar Cursos
+    // 1. Criar Cursos
     const curso1 = await this.cursoRepo.save(this.cursoRepo.create({ 
       nome: 'Engenharia de Software',
       coordenador: 'Prof. Professor A'
@@ -41,14 +41,14 @@ export class SeedService implements OnApplicationBootstrap {
       coordenador: 'Profa. Professor B'
     }));
 
-    // 2. Criar Usuários com diferentes níveis
+    // 2. Criar Usuários com diferentes níveis e STATUS
     await this.usuarioRepo.save(this.usuarioRepo.create({
       nome: 'Administrador Supremo',
       ra: 'admin001',
       email: 'admin@lab.com',
-      senha: 'admin', // O @BeforeInsert vai criptografar automaticamente!
+      senha: 'admin',
       role: UserRole.ADMIN,
-      ativo: true, // Já aprovado
+      status: 'ATIVO',
       curso: curso1
     }));
 
@@ -56,9 +56,9 @@ export class SeedService implements OnApplicationBootstrap {
       nome: 'Supervisor de Laboratório',
       ra: 'sup001',
       email: 'supervisor@lab.com',
-      senha: 'supervisor123',
+      senha: 'supervisor',
       role: UserRole.SUPERVISOR,
-      ativo: true, // Já aprovado
+      status: 'ATIVO',
       curso: curso1
     }));
 
@@ -68,7 +68,7 @@ export class SeedService implements OnApplicationBootstrap {
       email: 'user@lab.com',
       senha: 'user123',
       role: UserRole.COMUM,
-      ativo: true, // Já aprovado
+      status: 'ATIVO',
       curso: curso2
     }));
 
@@ -78,7 +78,7 @@ export class SeedService implements OnApplicationBootstrap {
       email: 'user002@lab.com',
       senha: 'user123',
       role: UserRole.COMUM,
-      ativo: false, // Ficará aguardando aprovação para você testar a rota!
+      status: 'PENDENTE',
       curso: curso2
     }));
 

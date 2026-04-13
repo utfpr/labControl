@@ -62,9 +62,13 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas.');
     }
 
-    // 3. Verifica a trava de segurança (Aprovação do Admin)
-    if (!usuario.ativo) {
-      throw new UnauthorizedException('Acesso negado. Seu cadastro ainda está pendente de aprovação.');
+    // 3. Verifica a trava de segurança pelos 3 estados de STATUS
+    if (usuario.status === 'PENDENTE') {
+      throw new UnauthorizedException('Sua conta ainda aguarda aprovação da supervisão.');
+    }
+    
+    if (usuario.status === 'BLOQUEADO') {
+      throw new UnauthorizedException('O seu acesso ao sistema foi bloqueado. Procure a supervisão.');
     }
 
     // 4. Gera o Token JWT contendo a "identidade" do usuário
@@ -76,6 +80,7 @@ export class AuthService {
         id: usuario.id,
         nome: usuario.nome,
         role: usuario.role,
+        status: usuario.status, // Garante que o status vá para o frontend
       }
     };
   }
