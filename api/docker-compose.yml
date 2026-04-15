@@ -15,7 +15,7 @@ services:
       - DB_PORT=5432
       - DB_USERNAME=admin
       - DB_PASSWORD=admin
-      - DB_DATABASE=app_db
+      - DB_DATABASE=labcontrol
     depends_on:
       - postgres
     dns:
@@ -31,7 +31,7 @@ services:
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=app_db
+      - POSTGRES_DB=labcontrol
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

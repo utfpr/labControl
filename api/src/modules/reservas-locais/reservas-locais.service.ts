@@ -1,9 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { ReservaLocal } from '../entities/reserva.local.entity';
 import { Aula } from '../entities/aula.entity';
-import { Status } from '../../common/enums'; // Ajuste o caminho se a sua pasta common estiver em outro nível
+import { Status } from '../../common/enums';
 
 @Injectable()
 export class ReservasLocaisService {
@@ -61,7 +61,7 @@ export class ReservasLocaisService {
       dataHoraInicio: inicio,
       dataHoraFim: fim,
       motivo: dados.motivo,
-      status: dados.status || Status.PENDENTE,
+      status: Status.PENDENTE, // Segurança: força estado inicial pendente
       solicitante: { id: dados.solicitanteId },
       local: { id: dados.localId },
     } as unknown as ReservaLocal);
@@ -72,6 +72,28 @@ export class ReservasLocaisService {
   async listarTodas(): Promise<ReservaLocal[]> {
     return await this.reservasLocaisRepository.find({
       relations: ['solicitante', 'local'],
+      order: { createdAt: 'DESC' }
     });
+  }
+
+  // 👇 NOVOS MÉTODOS ADICIONADOS 👇
+
+  async listarMinhasReservas(usuarioId: string): Promise<ReservaLocal[]> {
+    return await this.reservasLocaisRepository.find({
+      where: { solicitante: { id: usuarioId } },
+      relations: ['local'],
+      order: { createdAt: 'DESC' }
+    });
+  }
+
+  async alterarStatus(id: string, novoStatus: Status): Promise<ReservaLocal> {
+    const reserva = await this.reservasLocaisRepository.findOneBy({ id });
+    
+    if (!reserva) {
+      throw new NotFoundException('Reserva de local não encontrada.');
+    }
+
+    reserva.status = novoStatus;
+    return await this.reservasLocaisRepository.save(reserva);
   }
 }

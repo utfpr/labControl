@@ -1,10 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { ReservaEquipamento } from '../entities/reserva.equipamento.entity';
 import { Equipamento } from '../entities/equipamento.entity';
 import { Aula } from '../entities/aula.entity';
-import { Status } from '../../common/enums'; // Ajuste o caminho se necessário
+import { Status } from '../../common/enums'; 
 
 @Injectable()
 export class ReservasEquipamentosService {
@@ -38,7 +38,7 @@ export class ReservasEquipamentosService {
     const equipamentoRepository = this.dataSource.getRepository(Equipamento);
     const equipamento = await equipamentoRepository.findOne({
       where: { id: dados.equipamentoId },
-      relations: ['local'] // Trazemos o local físico junto
+      relations: ['local'] 
     });
 
     if (!equipamento || !equipamento.local) {
@@ -55,7 +55,7 @@ export class ReservasEquipamentosService {
     const horaReservaFim = fim.toTimeString().split(' ')[0];
 
     const aulasNoLocal = await aulasRepository.createQueryBuilder('aula')
-      .where('aula.localId = :localId', { localId: equipamento.local.id }) // Compara com o local DO equipamento
+      .where('aula.localId = :localId', { localId: equipamento.local.id }) 
       .andWhere('aula.dataInicio <= :data', { data: dataReservaString })
       .andWhere('aula.dataFim >= :data', { data: dataReservaString })
       .andWhere('aula.diaSemana = :diaSemana', { diaSemana: diaSemanaAula })
@@ -72,7 +72,7 @@ export class ReservasEquipamentosService {
       dataHoraInicio: inicio,
       dataHoraFim: fim,
       motivo: dados.motivo,
-      status: dados.status || Status.PENDENTE,
+      status: Status.PENDENTE, // Forçamos o estado inicial seguro
       solicitante: { id: dados.solicitanteId },
       equipamento: { id: dados.equipamentoId },
     } as unknown as ReservaEquipamento);
@@ -83,6 +83,28 @@ export class ReservasEquipamentosService {
   async listarTodas(): Promise<ReservaEquipamento[]> {
     return await this.reservasEquipamentosRepository.find({
       relations: ['solicitante', 'equipamento'],
+      order: { createdAt: 'DESC' }
     });
+  }
+
+  // 👇 NOVOS MÉTODOS ADICIONADOS 👇
+
+  async listarMinhasReservas(usuarioId: string): Promise<ReservaEquipamento[]> {
+    return await this.reservasEquipamentosRepository.find({
+      where: { solicitante: { id: usuarioId } },
+      relations: ['equipamento', 'equipamento.local'],
+      order: { createdAt: 'DESC' }
+    });
+  }
+
+  async alterarStatus(id: string, novoStatus: Status): Promise<ReservaEquipamento> {
+    const reserva = await this.reservasEquipamentosRepository.findOneBy({ id });
+    
+    if (!reserva) {
+      throw new NotFoundException('Reserva não encontrada.');
+    }
+
+    reserva.status = novoStatus;
+    return await this.reservasEquipamentosRepository.save(reserva);
   }
 }

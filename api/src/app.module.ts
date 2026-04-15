@@ -27,7 +27,7 @@ import { SeedModule } from './seed/seed.module';
         port: configService.get<number>('DB_PORT', 5432),
         username: configService.get<string>('DB_USERNAME', 'admin'),
         password: configService.get<string>('DB_PASSWORD', 'admin'),
-        database: configService.get<string>('DB_DATABASE', 'app_db'),
+        database: configService.get<string>('DB_DATABASE', 'labcontrol'),
         
         // Esta linha faz o TypeORM buscar todas as entidades automaticamente
         entities: [__dirname + '/**/*.entity{.ts,.js}'], 

@@ -10,12 +10,6 @@ export enum EquipamentoStatus {
   EM_MANUTENCAO = 'em manutencao',
 }
 
-export enum ReservaStatus {
-  PENDENTE = 'pendente',
-  CONFIRMADA = 'confirmada',
-  CANCELADA = 'cancelada',
-}
-
 export enum Status {
   PENDENTE = 'pendente',
   APROVADA = 'aprovada',

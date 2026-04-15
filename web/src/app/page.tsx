@@ -7,8 +7,8 @@ import {
   FileText, CheckCircle, Eye, EyeOff
 } from "lucide-react";
 
-// 👇 Configuração Global de Upload do Frontend
-const MAX_UPLOAD_MB = 1;
+// 👇 Lê a variável configurada no .env.local (Padrão: 1MB)
+const MAX_UPLOAD_MB = Number(process.env.NEXT_PUBLIC_MAX_COMPROVANTE_SIZE_MB || 1);
 const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
 export default function LoginPage() {
@@ -267,7 +267,7 @@ export default function LoginPage() {
                 </div>
 
                 <div>
-                  {/* 👇 Label reflete a variável automaticamente */}
+                  {/* 👇 Exibe dinamicamente o tamanho do arquivo configurado no .env.local */}
                   <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Comprovante (PDF, Máx: {MAX_UPLOAD_MB}MB)</label>
                   <label className="flex flex-col items-center justify-center w-full h-16 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 transition-colors">
                     <div className="flex flex-col items-center justify-center py-2">
@@ -277,7 +277,7 @@ export default function LoginPage() {
                         <p className="text-xs text-slate-500"><Upload className="inline w-3 h-3 mr-1" /> Anexar PDF</p>
                       )}
                     </div>
-                    {/* Validação dinâmica pelo tamanho definido */}
+                    {/* Validação usando a constante convertida em bytes */}
                     <input 
                       type="file" 
                       className="hidden" 

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Usuario } from './usuario.entity';
 import { Equipamento } from './equipamento.entity';
-import { ReservaStatus } from '../../common/enums';
+import { Status } from '../../common/enums'; // 👈 Trocado para 'Status'
 
 @Entity('reservas_equipamentos')
 export class ReservaEquipamento {
@@ -14,8 +14,9 @@ export class ReservaEquipamento {
   @Column({ type: 'timestamp' })
   dataHoraFim: Date;
 
-  @Column({ type: 'enum', enum: ReservaStatus, default: ReservaStatus.PENDENTE })
-  status: ReservaStatus;
+  // 👇 Atualizado para usar o enum correto
+  @Column({ type: 'enum', enum: Status, default: Status.PENDENTE })
+  status: Status;
 
   @ManyToOne(() => Usuario)
   solicitante: Usuario;

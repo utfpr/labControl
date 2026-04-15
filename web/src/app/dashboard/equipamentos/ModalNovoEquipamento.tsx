@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { X, Upload, FileText } from "lucide-react";
 
-// 👇 Configuração Global de Upload para Equipamentos
-const MAX_UPLOAD_MB = 5;
+// 👇 Lê a variável configurada no .env.local (Padrão: 5MB)
+const MAX_UPLOAD_MB = Number(process.env.NEXT_PUBLIC_MAX_POP_SIZE_MB || 5);
 const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
 interface EquipamentoData {

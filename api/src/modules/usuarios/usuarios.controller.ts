@@ -4,14 +4,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
+import * as dotenv from 'dotenv';
 import { UsuariosService } from './usuarios.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../common/enums';
 
-// 👇 Constantes de configuração preparadas para uso futuro com .env
-const MAX_FILE_SIZE_MB = 1;
+// Carrega as variáveis e define o limite do Comprovante (Padrão: 1MB)
+dotenv.config();
+const MAX_FILE_SIZE_MB = parseInt(process.env.MAX_COMPROVANTE_SIZE_MB || '1', 10);
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 const multerComprovanteConfig = {
@@ -31,7 +33,7 @@ const multerComprovanteConfig = {
     else cb(new BadRequestException('Apenas arquivos PDF são permitidos!'), false);
   },
   limits: {
-    fileSize: MAX_FILE_SIZE_BYTES // Aplica a constante
+    fileSize: MAX_FILE_SIZE_BYTES
   }
 };
 
