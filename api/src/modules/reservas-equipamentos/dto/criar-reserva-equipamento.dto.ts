@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEnum, IsDateString } from 'class-validator';
-import { Status } from '../../../common/enums'; 
+import { Status } from '../../../common/enums';
 
 export class CriarReservaEquipamentoDto {
   @ApiProperty({ example: '2026-04-12T14:00:00Z', description: 'Data de início' })
@@ -18,15 +18,15 @@ export class CriarReservaEquipamentoDto {
   @IsOptional()
   motivo?: string;
 
-  @ApiProperty({ enum: Status, example: Status.PENDENTE })
+  @ApiPropertyOptional({ enum: Status, example: Status.PENDENTE })
   @IsEnum(Status)
-  @IsNotEmpty()
-  status: Status;
+  @IsOptional()
+  status?: Status;
 
-  @ApiProperty({ example: 'uuid-do-usuario', description: 'ID do solicitante' })
+  @ApiPropertyOptional({ example: 'uuid-do-usuario', description: 'ID do solicitante' })
   @IsUUID()
-  @IsNotEmpty()
-  solicitanteId: string;
+  @IsOptional()
+  solicitanteId?: string;
 
   @ApiProperty({ example: 'uuid-do-equipamento', description: 'ID do equipamento' })
   @IsUUID()

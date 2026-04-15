@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-// 👇 Adicionamos o IsUUID aqui nesta linha:
 import { IsString, IsEmail, IsNotEmpty, IsEnum, IsUUID } from 'class-validator';
 import { UserRole } from '../../../common/enums';
 

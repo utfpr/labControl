@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEnum, IsDateString } from 'class-validator';
-import { Status } from '../../../common/enums'; // Ajuste o nome/caminho do seu Enum de status
+import { Status } from '../../../common/enums'; 
 
 export class CriarReservaLocalDto {
   @ApiProperty({ example: '2026-04-10T08:00:00Z', description: 'Data e hora de início da reserva' })
@@ -18,15 +18,15 @@ export class CriarReservaLocalDto {
   @IsOptional()
   motivo?: string;
 
-  @ApiProperty({ enum: Status, example: Status.PENDENTE, description: 'Status atual da reserva' })
+  @ApiPropertyOptional({ enum: Status, example: Status.PENDENTE, description: 'Status atual da reserva' })
   @IsEnum(Status)
-  @IsNotEmpty()
-  status: Status;
+  @IsOptional()
+  status?: Status;
 
-  @ApiProperty({ example: 'uuid-do-usuario', description: 'ID do usuário solicitante' })
+  @ApiPropertyOptional({ example: 'uuid-do-usuario', description: 'ID do usuário solicitante' })
   @IsUUID()
-  @IsNotEmpty()
-  solicitanteId: string;
+  @IsOptional()
+  solicitanteId?: string;
 
   @ApiProperty({ example: 'uuid-do-local', description: 'ID do laboratório/local reservado' })
   @IsUUID()

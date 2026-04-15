@@ -14,7 +14,6 @@ export class ReservaLocal {
   @Column({ type: 'timestamp' })
   dataHoraFim: Date;
 
-  // 👇 Atualizado para usar o enum correto
   @Column({ type: 'enum', enum: Status, default: Status.PENDENTE })
   status: Status;
 

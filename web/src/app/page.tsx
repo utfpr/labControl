@@ -7,7 +7,6 @@ import {
   FileText, CheckCircle, Eye, EyeOff
 } from "lucide-react";
 
-// 👇 Lê a variável configurada no .env.local (Padrão: 1MB)
 const MAX_UPLOAD_MB = Number(process.env.NEXT_PUBLIC_MAX_COMPROVANTE_SIZE_MB || 1);
 const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
@@ -115,7 +114,7 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) throw new Error(data.message || "Erro ao criar conta.");
 
       setSucessoRegistro(true);
@@ -267,7 +266,6 @@ export default function LoginPage() {
                 </div>
 
                 <div>
-                  {/* 👇 Exibe dinamicamente o tamanho do arquivo configurado no .env.local */}
                   <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Comprovante (PDF, Máx: {MAX_UPLOAD_MB}MB)</label>
                   <label className="flex flex-col items-center justify-center w-full h-16 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 transition-colors">
                     <div className="flex flex-col items-center justify-center py-2">
@@ -278,11 +276,11 @@ export default function LoginPage() {
                       )}
                     </div>
                     {/* Validação usando a constante convertida em bytes */}
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      accept=".pdf" 
-                      onChange={(e) => { 
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept=".pdf"
+                      onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           if (file.size > MAX_UPLOAD_BYTES) {
@@ -293,7 +291,7 @@ export default function LoginPage() {
                             setArquivo(file);
                           }
                         }
-                      }} 
+                      }}
                     />
                   </label>
                 </div>

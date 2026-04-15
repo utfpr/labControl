@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, BeforeInsert } from 'typeorm';
-import { Curso } from './curso.entity'; 
-import { UserRole } from '../../common/enums'; 
+import { Curso } from './curso.entity';
+import { UserRole } from '../../common/enums';
 import * as bcrypt from 'bcrypt';
 
 @Entity('usuarios')
@@ -9,26 +9,25 @@ export class Usuario {
   id: string;
 
   @Column()
-  nome: string; 
+  nome: string;
 
   @Column({ unique: true })
-  ra: string; 
+  ra: string;
 
   @Column({ unique: true })
   email: string;
 
   @Column()
-  senha: string; 
+  senha: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.COMUM })
   role: UserRole;
 
-  // 👇 SUBSTITUÍMOS O 'ATIVO' PELO 'STATUS'
   @Column({ default: 'PENDENTE' })
   status: string; // Pode ser: 'PENDENTE', 'ATIVO' ou 'BLOQUEADO'
 
   @Column({ nullable: true })
-  comprovanteMatricula: string; 
+  comprovanteMatricula: string;
 
   @ManyToOne(() => Curso, (curso) => curso.usuarios, { nullable: true })
   curso: Curso;

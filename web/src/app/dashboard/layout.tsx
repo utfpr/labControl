@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes"; 
+import { useTheme } from "next-themes";
 import {
   Home, CalendarDays, Monitor, MapPin,
   GraduationCap, BookOpen, Menu, User, LogOut,
-  Sun, Moon, Users, CalendarRange
+  Sun, Moon, Users, CalendarRange, School
 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setMounted(true);
   }, []);
 
-  // 👇 Menu Atualizado com as Novas Rotas de Reserva
   const menus = [
     { nome: "Home", href: "/dashboard", icone: Home },
     { nome: "Res. Equipamentos", href: "/dashboard/reservas-equipamentos", icone: CalendarDays },
@@ -32,6 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { nome: "Aulas", href: "/dashboard/aulas", icone: GraduationCap },
     { nome: "Cursos", href: "/dashboard/cursos", icone: BookOpen },
     { nome: "Usuários", href: "/dashboard/usuarios", icone: Users },
+    { nome: "Disciplinas", href: "/dashboard/disciplinas", icone: School },
   ];
 
   const handleLogout = () => {

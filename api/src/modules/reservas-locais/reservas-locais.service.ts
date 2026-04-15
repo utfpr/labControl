@@ -11,7 +11,7 @@ export class ReservasLocaisService {
     @InjectRepository(ReservaLocal)
     private reservasLocaisRepository: Repository<ReservaLocal>,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(dados: any): Promise<ReservaLocal> {
     const inicio = new Date(dados.dataHoraInicio || dados.dataInicio);
@@ -23,7 +23,7 @@ export class ReservasLocaisService {
 
     // REGRA 1: Choque com outras Reservas (Double Booking)
     const conflitoReserva = await this.reservasLocaisRepository.createQueryBuilder('reserva')
-      .where('reserva.localId = :localId', { localId: dados.localId })
+      .where('reserva.local_id = :localId', { localId: dados.localId })
       .andWhere('reserva.status IN (:...status)', { status: [Status.PENDENTE, Status.APROVADA] })
       .andWhere('reserva.dataHoraInicio < :fim', { fim })
       .andWhere('reserva.dataHoraFim > :inicio', { inicio })
@@ -43,10 +43,10 @@ export class ReservasLocaisService {
     const horaReservaFim = fim.toTimeString().split(' ')[0];
 
     const aulasNoLocal = await aulasRepository.createQueryBuilder('aula')
-      .where('aula.localId = :localId', { localId: dados.localId })
-      .andWhere('aula.dataInicio <= :data', { data: dataReservaString }) // A reserva ocorre dentro do semestre?
-      .andWhere('aula.dataFim >= :data', { data: dataReservaString })
-      .andWhere('aula.diaSemana = :diaSemana', { diaSemana: diaSemanaAula }) // É no mesmo dia da semana?
+      .where('aula.local_id = :localId', { localId: dados.localId })
+      .andWhere('aula.data_inicio <= :data', { data: dataReservaString })
+      .andWhere('aula.data_fim >= :data', { data: dataReservaString })
+      .andWhere('aula.dia_semana = :diaSemana', { diaSemana: diaSemanaAula })
       .getMany();
 
     // Se houverem aulas no local no mesmo dia da semana, checamos a intersecção de horas
@@ -76,8 +76,6 @@ export class ReservasLocaisService {
     });
   }
 
-  // 👇 NOVOS MÉTODOS ADICIONADOS 👇
-
   async listarMinhasReservas(usuarioId: string): Promise<ReservaLocal[]> {
     return await this.reservasLocaisRepository.find({
       where: { solicitante: { id: usuarioId } },
@@ -88,7 +86,7 @@ export class ReservasLocaisService {
 
   async alterarStatus(id: string, novoStatus: Status): Promise<ReservaLocal> {
     const reserva = await this.reservasLocaisRepository.findOneBy({ id });
-    
+
     if (!reserva) {
       throw new NotFoundException('Reserva de local não encontrada.');
     }

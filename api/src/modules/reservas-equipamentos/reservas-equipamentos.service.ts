@@ -4,7 +4,7 @@ import { Repository, DataSource } from 'typeorm';
 import { ReservaEquipamento } from '../entities/reserva.equipamento.entity';
 import { Equipamento } from '../entities/equipamento.entity';
 import { Aula } from '../entities/aula.entity';
-import { Status } from '../../common/enums'; 
+import { Status } from '../../common/enums';
 
 @Injectable()
 export class ReservasEquipamentosService {
@@ -12,7 +12,7 @@ export class ReservasEquipamentosService {
     @InjectRepository(ReservaEquipamento)
     private reservasEquipamentosRepository: Repository<ReservaEquipamento>,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(dados: any): Promise<ReservaEquipamento> {
     const inicio = new Date(dados.dataHoraInicio || dados.dataInicio);
@@ -24,7 +24,7 @@ export class ReservasEquipamentosService {
 
     // REGRA 1: Choque com outras Reservas do mesmo Equipamento
     const conflitoReserva = await this.reservasEquipamentosRepository.createQueryBuilder('reserva')
-      .where('reserva.equipamentoId = :equipamentoId', { equipamentoId: dados.equipamentoId })
+      .where('reserva.equipamento_id = :equipamentoId', { equipamentoId: dados.equipamentoId })
       .andWhere('reserva.status IN (:...status)', { status: [Status.PENDENTE, Status.APROVADA] })
       .andWhere('reserva.dataHoraInicio < :fim', { fim })
       .andWhere('reserva.dataHoraFim > :inicio', { inicio })
@@ -38,7 +38,7 @@ export class ReservasEquipamentosService {
     const equipamentoRepository = this.dataSource.getRepository(Equipamento);
     const equipamento = await equipamentoRepository.findOne({
       where: { id: dados.equipamentoId },
-      relations: ['local'] 
+      relations: ['local']
     });
 
     if (!equipamento || !equipamento.local) {
@@ -55,10 +55,10 @@ export class ReservasEquipamentosService {
     const horaReservaFim = fim.toTimeString().split(' ')[0];
 
     const aulasNoLocal = await aulasRepository.createQueryBuilder('aula')
-      .where('aula.localId = :localId', { localId: equipamento.local.id }) 
-      .andWhere('aula.dataInicio <= :data', { data: dataReservaString })
-      .andWhere('aula.dataFim >= :data', { data: dataReservaString })
-      .andWhere('aula.diaSemana = :diaSemana', { diaSemana: diaSemanaAula })
+      .where('aula.local_id = :localId', { localId: equipamento.local.id })
+      .andWhere('aula.data_inicio <= :data', { data: dataReservaString })
+      .andWhere('aula.data_fim >= :data', { data: dataReservaString })
+      .andWhere('aula.dia_semana = :diaSemana', { diaSemana: diaSemanaAula })
       .getMany();
 
     for (const aula of aulasNoLocal) {
@@ -87,8 +87,6 @@ export class ReservasEquipamentosService {
     });
   }
 
-  // 👇 NOVOS MÉTODOS ADICIONADOS 👇
-
   async listarMinhasReservas(usuarioId: string): Promise<ReservaEquipamento[]> {
     return await this.reservasEquipamentosRepository.find({
       where: { solicitante: { id: usuarioId } },
@@ -99,7 +97,7 @@ export class ReservasEquipamentosService {
 
   async alterarStatus(id: string, novoStatus: Status): Promise<ReservaEquipamento> {
     const reserva = await this.reservasEquipamentosRepository.findOneBy({ id });
-    
+
     if (!reserva) {
       throw new NotFoundException('Reserva não encontrada.');
     }

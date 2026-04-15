@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { X, Upload, FileText } from "lucide-react";
 
-// 👇 Lê a variável configurada no .env.local (Padrão: 5MB)
 const MAX_UPLOAD_MB = Number(process.env.NEXT_PUBLIC_MAX_POP_SIZE_MB || 5);
 const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
@@ -30,10 +29,10 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
   const [status, setStatus] = useState("normal");
   const [cursoId, setCursoId] = useState("");
   const [localId, setLocalId] = useState("");
-  
+
   const [cursos, setCursos] = useState<{ id: string; nome: string }[]>([]);
   const [locais, setLocais] = useState<{ id: string; nome: string }[]>([]);
-  
+
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
 
@@ -87,7 +86,7 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
 
     try {
       const token = localStorage.getItem("labcontrol_token");
-      
+
       const formData = new FormData();
       formData.append("nome", nome);
       formData.append("patrimonio", patrimonio);
@@ -107,8 +106,8 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
 
       const response = await fetch(url, {
         method: method,
-        headers: { 
-          "Authorization": `Bearer ${token}` 
+        headers: {
+          "Authorization": `Bearer ${token}`
         },
         body: formData,
       });
@@ -121,7 +120,7 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
       }
 
       onSuccess();
-    } catch (err: unknown) { 
+    } catch (err: unknown) {
       if (err instanceof Error) {
         setErro(err.message);
       } else {
@@ -184,7 +183,6 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
           </div>
 
           <div>
-            {/* 👇 Label agora utiliza a constante para se atualizar automaticamente */}
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               {equipamento ? `Substituir POP (Opcional, Máx: ${MAX_UPLOAD_MB}MB)` : `Anexar POP (Opcional, Máx: ${MAX_UPLOAD_MB}MB)`}
             </label>
@@ -200,11 +198,11 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
                   </p>
                 )}
               </div>
-              <input 
-                type="file" 
-                className="hidden" 
-                accept=".pdf" 
-                onChange={(e) => { 
+              <input
+                type="file"
+                className="hidden"
+                accept=".pdf"
+                onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
                     if (file.size > MAX_UPLOAD_BYTES) {
@@ -215,7 +213,7 @@ export default function ModalNovoEquipamento({ isOpen, onClose, onSuccess, equip
                       setArquivo(file);
                     }
                   }
-                }} 
+                }}
               />
             </label>
           </div>

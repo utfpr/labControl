@@ -10,7 +10,7 @@ import { UserRole } from '../../common/enums';
 // ❌ REMOVA O @UseGuards E O @ApiBearerAuth DAQUI DE CIMA!
 @Controller('cursos')
 export class CursosController {
-  constructor(private readonly cursosService: CursosService) {}
+  constructor(private readonly cursosService: CursosService) { }
 
   @Post()
   @ApiBearerAuth() // 👈 Coloque a proteção apenas aqui
@@ -21,7 +21,6 @@ export class CursosController {
     return this.cursosService.criar(dados);
   }
 
-  // 👇 Esta rota agora está 100% livre para a tela de Registro!
   @Get()
   @ApiOperation({ summary: 'Lista todos os cursos (Público)' })
   async listarTodos() {
