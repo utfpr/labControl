@@ -1,72 +1,84 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ReservaLocal } from '../entities/reserva.local.entity';
-import { Aula } from '../entities/aula.entity';
-import { Status } from '../../common/enums';
+import { Usuario } from '../entities/usuario.entity';
+import { Local } from '../entities/local.entity';
+import { Status, ReservaTipo } from '../../common/enums';
+import { CriarReservaLocalDto } from './dto/criar-reserva-local.dto';
+import { BookingConflictService, DateTimeRange } from '../shared/booking-conflict.service';
+import { BookingHistoryService } from '../shared/booking-history.service';
 
 @Injectable()
 export class ReservasLocaisService {
   constructor(
     @InjectRepository(ReservaLocal)
     private reservasLocaisRepository: Repository<ReservaLocal>,
-    private dataSource: DataSource,
+    private bookingConflictService: BookingConflictService,
+    private bookingHistoryService: BookingHistoryService,
   ) { }
 
-  async criar(dados: any): Promise<ReservaLocal> {
-    const inicio = new Date(dados.dataHoraInicio || dados.dataInicio);
-    const fim = new Date(dados.dataHoraFim || dados.dataFim);
+  async criar(dados: CriarReservaLocalDto): Promise<ReservaLocal> {
+    const inicio = new Date(dados.dataHoraInicio);
+    const fim = new Date(dados.dataHoraFim);
 
-    if (inicio >= fim) {
-      throw new BadRequestException('A data de início deve ser anterior à data de fim.');
+    // Validate datetime range
+    const validationError = this.bookingConflictService.validateDateTimeRange(inicio, fim);
+    if (validationError) {
+      throw new BadRequestException(validationError);
     }
 
-    // REGRA 1: Choque com outras Reservas (Double Booking)
-    const conflitoReserva = await this.reservasLocaisRepository.createQueryBuilder('reserva')
-      .where('reserva.local_id = :localId', { localId: dados.localId })
-      .andWhere('reserva.status IN (:...status)', { status: [Status.PENDENTE, Status.APROVADA] })
-      .andWhere('reserva.dataHoraInicio < :fim', { fim })
-      .andWhere('reserva.dataHoraFim > :inicio', { inicio })
-      .getOne();
-
-    if (conflitoReserva) {
-      throw new BadRequestException('Este laboratório já possui uma reserva ativa para este horário.');
+    // Prevent booking in the past
+    const agora = new Date();
+    agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset() / 60);
+    if (inicio < agora) {
+      throw new BadRequestException('Não é possível reservar datas no passado.');
     }
 
-    // REGRA 2: Choque com a Grade de Aulas (Recorrência)
-    const aulasRepository = this.dataSource.getRepository(Aula);
-    const dataReservaString = inicio.toISOString().split('T')[0]; // Extrai "YYYY-MM-DD"
-    const diaSemanaJS = inicio.getDay(); // Retorna 0 (Dom) a 6 (Sáb)
-    const diaSemanaAula = diaSemanaJS === 0 ? 7 : diaSemanaJS; // Converte para o seu padrão (1 a 7)
+    const datetimeRange: DateTimeRange = { inicio, fim };
 
-    const horaReservaInicio = inicio.toTimeString().split(' ')[0]; // Extrai "HH:MM:SS"
-    const horaReservaFim = fim.toTimeString().split(' ')[0];
-
-    const aulasNoLocal = await aulasRepository.createQueryBuilder('aula')
-      .where('aula.local_id = :localId', { localId: dados.localId })
-      .andWhere('aula.data_inicio <= :data', { data: dataReservaString })
-      .andWhere('aula.data_fim >= :data', { data: dataReservaString })
-      .andWhere('aula.dia_semana = :diaSemana', { diaSemana: diaSemanaAula })
-      .getMany();
-
-    // Se houverem aulas no local no mesmo dia da semana, checamos a intersecção de horas
-    for (const aula of aulasNoLocal) {
-      if (aula.horaInicio < horaReservaFim && aula.horaFim > horaReservaInicio) {
-        throw new BadRequestException(`Local indisponível. Há uma aula cadastrada na grade das ${aula.horaInicio} às ${aula.horaFim}.`);
-      }
+    // Check for existing booking conflicts
+    const bookingConflictError = await this.bookingConflictService.checkLocationBookingConflict(
+      dados.localId,
+      datetimeRange.inicio,
+      datetimeRange.fim,
+    );
+    if (bookingConflictError) {
+      throw new BadRequestException(bookingConflictError);
     }
 
-    // Se sobreviveu às validações, o caminho está livre!
-    const novaReserva = this.reservasLocaisRepository.create({
-      dataHoraInicio: inicio,
-      dataHoraFim: fim,
-      motivo: dados.motivo,
-      status: Status.PENDENTE, // Segurança: força estado inicial pendente
-      solicitante: { id: dados.solicitanteId },
-      local: { id: dados.localId },
-    } as unknown as ReservaLocal);
+    // Check for academic schedule conflicts
+    const scheduleConflictError = await this.bookingConflictService.checkAcademicScheduleConflict(
+      dados.localId,
+      datetimeRange.inicio,
+      datetimeRange.fim,
+    );
+    if (scheduleConflictError) {
+      throw new BadRequestException(scheduleConflictError);
+    }
 
-    return await this.reservasLocaisRepository.save(novaReserva);
+    // All validations passed - create the reservation
+    try {
+      const novaReserva = await this.reservasLocaisRepository.save({
+        dataHoraInicio: inicio,
+        dataHoraFim: fim,
+        motivo: dados.motivo,
+        status: Status.PENDENTE,
+        solicitante: { id: dados.solicitanteId } as Usuario,
+        local: { id: dados.localId } as Local,
+      });
+
+      return novaReserva;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Erro ao criar reserva de local. Por favor, tente novamente.',
+      );
+    }
   }
 
   async listarTodas(): Promise<ReservaLocal[]> {
@@ -84,14 +96,111 @@ export class ReservasLocaisService {
     });
   }
 
-  async alterarStatus(id: string, novoStatus: Status): Promise<ReservaLocal> {
-    const reserva = await this.reservasLocaisRepository.findOneBy({ id });
+  async obterReserva(id: string): Promise<ReservaLocal> {
+    const reserva = await this.reservasLocaisRepository.findOne({
+      where: { id },
+      relations: ['solicitante', 'local'],
+    });
 
     if (!reserva) {
       throw new NotFoundException('Reserva de local não encontrada.');
     }
 
-    reserva.status = novoStatus;
-    return await this.reservasLocaisRepository.save(reserva);
+    return reserva;
+  }
+
+  async aprovar(id: string, usuarioId: string): Promise<ReservaLocal> {
+    const reserva = await this.obterReserva(id);
+
+    await this.bookingHistoryService.validarTransicaoAprovacao(reserva.status);
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.APROVADA;
+    const novaReserva = await this.reservasLocaisRepository.save(reserva);
+
+    await this.bookingHistoryService.criarHistorico(
+      reserva.id,
+      ReservaTipo.LOCAL,
+      usuarioId,
+      statusAntigo,
+      Status.APROVADA,
+    );
+
+    return novaReserva;
+  }
+
+  async rejeitar(id: string, usuarioId: string): Promise<ReservaLocal> {
+    const reserva = await this.obterReserva(id);
+
+    await this.bookingHistoryService.validarTransicaoRejeicao(reserva.status);
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.REJEITADA;
+    const novaReserva = await this.reservasLocaisRepository.save(reserva);
+
+    await this.bookingHistoryService.criarHistorico(
+      reserva.id,
+      ReservaTipo.LOCAL,
+      usuarioId,
+      statusAntigo,
+      Status.REJEITADA,
+    );
+
+    return novaReserva;
+  }
+
+  async finalizar(id: string, usuarioId: string): Promise<ReservaLocal> {
+    const reserva = await this.obterReserva(id);
+
+    await this.bookingHistoryService.validarTransicaoFinalizacao(reserva.status);
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.FINALIZADA;
+    const novaReserva = await this.reservasLocaisRepository.save(reserva);
+
+    await this.bookingHistoryService.criarHistorico(
+      reserva.id,
+      ReservaTipo.LOCAL,
+      usuarioId,
+      statusAntigo,
+      Status.FINALIZADA,
+    );
+
+    return novaReserva;
+  }
+
+  async cancelar(
+    id: string,
+    usuarioId: string,
+    userId: string,
+  ): Promise<ReservaLocal> {
+    const reserva = await this.obterReserva(id);
+
+    await this.bookingHistoryService.validarTransicaoCancelamentoUsuario(
+      reserva.status,
+      userId,
+      reserva,
+    );
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.CANCELADA;
+    const novaReserva = await this.reservasLocaisRepository.save(reserva);
+
+    await this.bookingHistoryService.criarHistorico(
+      reserva.id,
+      ReservaTipo.LOCAL,
+      usuarioId,
+      statusAntigo,
+      Status.CANCELADA,
+    );
+
+    return novaReserva;
+  }
+
+  async getHistoricoPorReserva(reservaId: string) {
+    return this.bookingHistoryService.getHistoricoPorReserva(
+      reservaId,
+      ReservaTipo.LOCAL,
+    );
   }
 }

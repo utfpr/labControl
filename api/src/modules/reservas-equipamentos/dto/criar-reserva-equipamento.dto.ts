@@ -6,12 +6,12 @@ export class CriarReservaEquipamentoDto {
   @ApiProperty({ example: '2026-04-12T14:00:00Z', description: 'Data de início' })
   @IsDateString()
   @IsNotEmpty()
-  dataInicio: string;
+  dataHoraInicio: string;
 
   @ApiProperty({ example: '2026-04-15T18:00:00Z', description: 'Data de término (devolução)' })
   @IsDateString()
   @IsNotEmpty()
-  dataFim: string;
+  dataHoraFim: string;
 
   @ApiPropertyOptional({ example: 'Uso no projeto de mestrado', description: 'Motivo do empréstimo' })
   @IsString()

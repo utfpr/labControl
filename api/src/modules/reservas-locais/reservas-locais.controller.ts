@@ -5,7 +5,7 @@ import { CriarReservaLocalDto } from './dto/criar-reserva-local.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole, Status } from '../../common/enums';
+import { UserRole, Status, ReservaTipo } from '../../common/enums';
 
 @ApiTags('Reservas de Locais')
 @ApiBearerAuth()
@@ -38,27 +38,34 @@ export class ReservasLocaisController {
   @Patch(':id/aprovar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Aprova uma reserva de local pendente' })
-  async aprovar(@Param('id') id: string) {
-    return this.reservasLocaisService.alterarStatus(id, Status.APROVADA);
+  async aprovar(@Param('id') id: string, @Req() req: any) {
+    return this.reservasLocaisService.aprovar(id, req.user.sub);
   }
 
   @Patch(':id/rejeitar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Rejeita uma reserva de local pendente' })
-  async rejeitar(@Param('id') id: string) {
-    return this.reservasLocaisService.alterarStatus(id, Status.REJEITADA);
+  async rejeitar(@Param('id') id: string, @Req() req: any) {
+    return this.reservasLocaisService.rejeitar(id, req.user.sub);
   }
 
   @Patch(':id/cancelar')
   @ApiOperation({ summary: 'Cancela a reserva de local (Pode ser feito pelo solicitante)' })
-  async cancelar(@Param('id') id: string) {
-    return this.reservasLocaisService.alterarStatus(id, Status.CANCELADA);
+  async cancelar(@Param('id') id: string, @Req() req: any) {
+    return this.reservasLocaisService.cancelar(id, req.user.sub, req.user.sub);
   }
 
   @Patch(':id/finalizar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Marca a reserva de local como finalizada' })
-  async finalizar(@Param('id') id: string) {
-    return this.reservasLocaisService.alterarStatus(id, Status.FINALIZADA);
+  async finalizar(@Param('id') id: string, @Req() req: any) {
+    return this.reservasLocaisService.finalizar(id, req.user.sub);
+  }
+
+  @Get(':id/historico')
+  @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
+  @ApiOperation({ summary: 'Consulta o histórico de status de uma reserva de local' })
+  async getHistorico(@Param('id') id: string) {
+    return this.reservasLocaisService.getHistoricoPorReserva(id);
   }
 }

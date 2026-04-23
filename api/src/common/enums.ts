@@ -4,6 +4,11 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
+export enum ReservaTipo {
+  LOCAL = 'local',
+  EQUIPAMENTO = 'equipamento',
+}
+
 export enum EquipamentoStatus {
   NORMAL = 'normal',
   QUEBRADO = 'quebrado',
