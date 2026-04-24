@@ -76,7 +76,7 @@ export class ReservasLocaisService {
       return novaReserva;
     } catch (error) {
       throw new InternalServerErrorException(
-        'Erro ao criar reserva de local. Por favor, tente novamente.',
+        'Erro ao criar reserva de local. Por favor, tente novamente.', error
       );
     }
   }
