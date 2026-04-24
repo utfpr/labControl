@@ -1,2 +1,2 @@
-export * from './booking-conflict.service';
-export * from './booking-history.service';
+export * from './conflito-reservas.service';
+export * from './historico-reservas.service';

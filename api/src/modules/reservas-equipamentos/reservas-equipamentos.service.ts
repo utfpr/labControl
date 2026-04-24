@@ -11,29 +11,29 @@ import { Usuario } from '../entities/usuario.entity';
 import { Equipamento } from '../entities/equipamento.entity';
 import { Status, ReservaTipo } from '../../common/enums';
 import { CriarReservaEquipamentoDto } from './dto/criar-reserva-equipamento.dto';
-import { BookingConflictService, DateTimeRange } from '../shared/booking-conflict.service';
-import { BookingHistoryService } from '../shared/booking-history.service';
+import { ConflitoReservasService, DateTimeRange } from '../shared/conflito-reservas.service';
+import { HistoricoReservasService } from '../shared/historico-reservas.service';
 
 @Injectable()
 export class ReservasEquipamentosService {
   constructor(
     @InjectRepository(ReservaEquipamento)
     private reservasEquipamentosRepository: Repository<ReservaEquipamento>,
-    private bookingConflictService: BookingConflictService,
-    private bookingHistoryService: BookingHistoryService,
+    private conflitoReservasService: ConflitoReservasService,
+    private historicoReservasService: HistoricoReservasService,
   ) { }
 
   async criar(dados: CriarReservaEquipamentoDto): Promise<ReservaEquipamento> {
     const inicio = new Date(dados.dataHoraInicio);
     const fim = new Date(dados.dataHoraFim);
 
-    // Validate datetime range
-    const validationError = this.bookingConflictService.validateDateTimeRange(inicio, fim);
-    if (validationError) {
-      throw new BadRequestException(validationError);
+    // Validar intervalo de datas
+    const erroValidacao = this.conflitoReservasService.validateIntervaloDatas(inicio, fim);
+    if (erroValidacao) {
+      throw new BadRequestException(erroValidacao);
     }
 
-    // Prevent booking in the past
+    // Impedir reserva no passado
     const agora = new Date();
     agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset() / 60);
     if (inicio < agora) {
@@ -42,27 +42,27 @@ export class ReservasEquipamentosService {
 
     const datetimeRange: DateTimeRange = { inicio, fim };
 
-    // Check for existing equipment booking conflicts
-    const bookingConflictError = await this.bookingConflictService.checkEquipmentBookingConflict(
+    // Verificar conflitos de reserva existentes para o equipamento
+    const erroConflito = await this.conflitoReservasService.checkEquipamentoReservaConflito(
       dados.equipamentoId,
       datetimeRange.inicio,
       datetimeRange.fim,
     );
-    if (bookingConflictError) {
-      throw new BadRequestException(bookingConflictError);
+    if (erroConflito) {
+      throw new BadRequestException(erroConflito);
     }
 
-    // Check for location occupancy conflicts
-    const locationConflictError = await this.bookingConflictService.checkEquipmentLocationConflict(
+    // Verificar conflitos de ocupação do local
+    const erroLocal = await this.conflitoReservasService.checkEquipamentoLocalConflito(
       dados.equipamentoId,
       datetimeRange.inicio,
       datetimeRange.fim,
     );
-    if (locationConflictError) {
-      throw new BadRequestException(locationConflictError);
+    if (erroLocal) {
+      throw new BadRequestException(erroLocal);
     }
 
-    // All validations passed - create the reservation
+    // Todas as validações passaram - criar a reserva
     try {
       const novaReserva = await this.reservasEquipamentosRepository.save({
         dataHoraInicio: inicio,
@@ -94,6 +94,110 @@ export class ReservasEquipamentosService {
       relations: ['equipamento', 'equipamento.local'],
       order: { createdAt: 'DESC' }
     });
+  }
+
+  async aprovar(id: string, usuarioId: string): Promise<ReservaEquipamento> {
+    const reserva = await this.obterReserva(id);
+
+    await this.historicoReservasService.validarTransicaoAprovacao(reserva.status);
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.APROVADA;
+    const novaReserva = await this.reservasEquipamentosRepository.save(reserva);
+
+    await this.historicoReservasService.criarRegistro(
+      reserva.id,
+      ReservaTipo.EQUIPAMENTO,
+      usuarioId,
+      statusAntigo,
+      Status.APROVADA,
+    );
+
+    return novaReserva;
+  }
+
+  async rejeitar(id: string, usuarioId: string): Promise<ReservaEquipamento> {
+    const reserva = await this.obterReserva(id);
+
+    await this.historicoReservasService.validarTransicaoRejeicao(reserva.status);
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.REJEITADA;
+    const novaReserva = await this.reservasEquipamentosRepository.save(reserva);
+
+    await this.historicoReservasService.criarRegistro(
+      reserva.id,
+      ReservaTipo.EQUIPAMENTO,
+      usuarioId,
+      statusAntigo,
+      Status.REJEITADA,
+    );
+
+    return novaReserva;
+  }
+
+  async cancelar(id: string, usuarioId: string, userId: string): Promise<ReservaEquipamento> {
+    const reserva = await this.obterReserva(id);
+
+    await this.historicoReservasService.validarTransicaoCancelamentoUsuario(
+      reserva.status,
+      userId,
+      reserva,
+    );
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.CANCELADA;
+    const novaReserva = await this.reservasEquipamentosRepository.save(reserva);
+
+    await this.historicoReservasService.criarRegistro(
+      reserva.id,
+      ReservaTipo.EQUIPAMENTO,
+      usuarioId,
+      statusAntigo,
+      Status.CANCELADA,
+    );
+
+    return novaReserva;
+  }
+
+  async finalizar(id: string, usuarioId: string): Promise<ReservaEquipamento> {
+    const reserva = await this.obterReserva(id);
+
+    await this.historicoReservasService.validarTransicaoFinalizacao(reserva.status);
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.FINALIZADA;
+    const novaReserva = await this.reservasEquipamentosRepository.save(reserva);
+
+    await this.historicoReservasService.criarRegistro(
+      reserva.id,
+      ReservaTipo.EQUIPAMENTO,
+      usuarioId,
+      statusAntigo,
+      Status.FINALIZADA,
+    );
+
+    return novaReserva;
+  }
+
+  async getHistoricoPorReserva(reservaId: string): Promise<any[]> {
+    return this.historicoReservasService.getHistoricoPorReserva(
+      reservaId,
+      ReservaTipo.EQUIPAMENTO,
+    );
+  }
+
+  private async obterReserva(id: string): Promise<ReservaEquipamento> {
+    const reserva = await this.reservasEquipamentosRepository.findOne({
+      where: { id },
+      relations: ['solicitante'],
+    });
+
+    if (!reserva) {
+      throw new NotFoundException('Reserva de equipamento não encontrada.');
+    }
+
+    return reserva;
   }
 
   async alterarStatus(id: string, novoStatus: Status): Promise<ReservaEquipamento> {

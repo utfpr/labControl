@@ -13,7 +13,7 @@ export interface DateTimeRange {
 }
 
 @Injectable()
-export class BookingConflictService {
+export class ConflitoReservasService {
   constructor(
     @InjectRepository(ReservaLocal)
     private reservasLocaisRepository: Repository<ReservaLocal>,
@@ -29,7 +29,7 @@ export class BookingConflictService {
   /**
    * Check for booking conflicts for a location
    */
-  async checkLocationBookingConflict(
+  async checkLocalReservaConflito(
     localId: string,
     dataHoraInicio: Date,
     dataHoraFim: Date,
@@ -51,7 +51,7 @@ export class BookingConflictService {
   /**
    * Check for academic schedule conflicts for a location at a specific datetime
    */
-  async checkAcademicScheduleConflict(
+  async checkGradeAulaConflito(
     localId: string,
     dataHoraInicio: Date,
     dataHoraFim: Date,
@@ -81,7 +81,7 @@ export class BookingConflictService {
   /**
    * Check for equipment booking conflicts
    */
-  async checkEquipmentBookingConflict(
+  async checkEquipamentoReservaConflito(
     equipamentoId: string,
     dataHoraInicio: Date,
     dataHoraFim: Date,
@@ -103,7 +103,7 @@ export class BookingConflictService {
   /**
    * Check if equipment's location is occupied by a class at the requested time
    */
-  async checkEquipmentLocationConflict(
+  async checkEquipamentoLocalConflito(
     equipamentoId: string,
     dataHoraInicio: Date,
     dataHoraFim: Date,
@@ -142,7 +142,7 @@ export class BookingConflictService {
   /**
    * Validate that end datetime is after start datetime
    */
-  validateDateTimeRange(inicio: Date, fim: Date): string | null {
+  validateIntervaloDatas(inicio: Date, fim: Date): string | null {
     if (inicio >= fim) {
       return 'A data de início deve ser anterior à data de fim.';
     }

@@ -11,29 +11,29 @@ import { Usuario } from '../entities/usuario.entity';
 import { Local } from '../entities/local.entity';
 import { Status, ReservaTipo } from '../../common/enums';
 import { CriarReservaLocalDto } from './dto/criar-reserva-local.dto';
-import { BookingConflictService, DateTimeRange } from '../shared/booking-conflict.service';
-import { BookingHistoryService } from '../shared/booking-history.service';
+import { ConflitoReservasService, DateTimeRange } from '../shared/conflito-reservas.service';
+import { HistoricoReservasService } from '../shared/historico-reservas.service';
 
 @Injectable()
 export class ReservasLocaisService {
   constructor(
     @InjectRepository(ReservaLocal)
     private reservasLocaisRepository: Repository<ReservaLocal>,
-    private bookingConflictService: BookingConflictService,
-    private bookingHistoryService: BookingHistoryService,
+    private conflitoReservasService: ConflitoReservasService,
+    private historicoReservasService: HistoricoReservasService,
   ) { }
 
   async criar(dados: CriarReservaLocalDto): Promise<ReservaLocal> {
     const inicio = new Date(dados.dataHoraInicio);
     const fim = new Date(dados.dataHoraFim);
 
-    // Validate datetime range
-    const validationError = this.bookingConflictService.validateDateTimeRange(inicio, fim);
-    if (validationError) {
-      throw new BadRequestException(validationError);
+    // Validar intervalo de datas
+    const erroValidacao = this.conflitoReservasService.validateIntervaloDatas(inicio, fim);
+    if (erroValidacao) {
+      throw new BadRequestException(erroValidacao);
     }
 
-    // Prevent booking in the past
+    // Impedir reserva no passado
     const agora = new Date();
     agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset() / 60);
     if (inicio < agora) {
@@ -42,27 +42,27 @@ export class ReservasLocaisService {
 
     const datetimeRange: DateTimeRange = { inicio, fim };
 
-    // Check for existing booking conflicts
-    const bookingConflictError = await this.bookingConflictService.checkLocationBookingConflict(
+    // Verificar conflitos de reserva existentes
+    const erroConflito = await this.conflitoReservasService.checkLocalReservaConflito(
       dados.localId,
       datetimeRange.inicio,
       datetimeRange.fim,
     );
-    if (bookingConflictError) {
-      throw new BadRequestException(bookingConflictError);
+    if (erroConflito) {
+      throw new BadRequestException(erroConflito);
     }
 
-    // Check for academic schedule conflicts
-    const scheduleConflictError = await this.bookingConflictService.checkAcademicScheduleConflict(
+    // Verificar conflitos com grade de aulas
+    const erroGrade = await this.conflitoReservasService.checkGradeAulaConflito(
       dados.localId,
       datetimeRange.inicio,
       datetimeRange.fim,
     );
-    if (scheduleConflictError) {
-      throw new BadRequestException(scheduleConflictError);
+    if (erroGrade) {
+      throw new BadRequestException(erroGrade);
     }
 
-    // All validations passed - create the reservation
+    // Todas as validações passaram - criar a reserva
     try {
       const novaReserva = await this.reservasLocaisRepository.save({
         dataHoraInicio: inicio,
@@ -112,13 +112,13 @@ export class ReservasLocaisService {
   async aprovar(id: string, usuarioId: string): Promise<ReservaLocal> {
     const reserva = await this.obterReserva(id);
 
-    await this.bookingHistoryService.validarTransicaoAprovacao(reserva.status);
+    await this.historicoReservasService.validarTransicaoAprovacao(reserva.status);
 
     const statusAntigo = reserva.status;
     reserva.status = Status.APROVADA;
     const novaReserva = await this.reservasLocaisRepository.save(reserva);
 
-    await this.bookingHistoryService.criarHistorico(
+    await this.historicoReservasService.criarRegistro(
       reserva.id,
       ReservaTipo.LOCAL,
       usuarioId,
@@ -132,13 +132,13 @@ export class ReservasLocaisService {
   async rejeitar(id: string, usuarioId: string): Promise<ReservaLocal> {
     const reserva = await this.obterReserva(id);
 
-    await this.bookingHistoryService.validarTransicaoRejeicao(reserva.status);
+    await this.historicoReservasService.validarTransicaoRejeicao(reserva.status);
 
     const statusAntigo = reserva.status;
     reserva.status = Status.REJEITADA;
     const novaReserva = await this.reservasLocaisRepository.save(reserva);
 
-    await this.bookingHistoryService.criarHistorico(
+    await this.historicoReservasService.criarRegistro(
       reserva.id,
       ReservaTipo.LOCAL,
       usuarioId,
@@ -152,13 +152,13 @@ export class ReservasLocaisService {
   async finalizar(id: string, usuarioId: string): Promise<ReservaLocal> {
     const reserva = await this.obterReserva(id);
 
-    await this.bookingHistoryService.validarTransicaoFinalizacao(reserva.status);
+    await this.historicoReservasService.validarTransicaoFinalizacao(reserva.status);
 
     const statusAntigo = reserva.status;
     reserva.status = Status.FINALIZADA;
     const novaReserva = await this.reservasLocaisRepository.save(reserva);
 
-    await this.bookingHistoryService.criarHistorico(
+    await this.historicoReservasService.criarRegistro(
       reserva.id,
       ReservaTipo.LOCAL,
       usuarioId,
@@ -176,7 +176,7 @@ export class ReservasLocaisService {
   ): Promise<ReservaLocal> {
     const reserva = await this.obterReserva(id);
 
-    await this.bookingHistoryService.validarTransicaoCancelamentoUsuario(
+    await this.historicoReservasService.validarTransicaoCancelamentoUsuario(
       reserva.status,
       userId,
       reserva,
@@ -186,7 +186,7 @@ export class ReservasLocaisService {
     reserva.status = Status.CANCELADA;
     const novaReserva = await this.reservasLocaisRepository.save(reserva);
 
-    await this.bookingHistoryService.criarHistorico(
+    await this.historicoReservasService.criarRegistro(
       reserva.id,
       ReservaTipo.LOCAL,
       usuarioId,
@@ -198,7 +198,7 @@ export class ReservasLocaisService {
   }
 
   async getHistoricoPorReserva(reservaId: string) {
-    return this.bookingHistoryService.getHistoricoPorReserva(
+    return this.historicoReservasService.getHistoricoPorReserva(
       reservaId,
       ReservaTipo.LOCAL,
     );

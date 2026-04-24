@@ -22,7 +22,7 @@ dist/
 build/
 out/
 .tsbuildinfo
- api/tsconfig.tsbuildinfo
+*.tsbuildinfo
  
 # ====================================================================
 # Variáveis de Ambiente e Segredos (CRÍTICO)

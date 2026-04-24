@@ -7,13 +7,13 @@ import { ReservaLocal } from '../entities/reserva.local.entity';
 import { ReservaEquipamento } from '../entities/reserva.equipamento.entity';
 
 @Injectable()
-export class BookingHistoryService {
+export class HistoricoReservasService {
   constructor(
     @InjectRepository(BookingHistory)
-    private bookingHistoryRepository: Repository<BookingHistory>,
+    private historicoRepository: Repository<BookingHistory>,
   ) { }
 
-  async criarHistorico(
+  async criarRegistro(
     reservaId: string,
     tipoReserva: ReservaTipo,
     usuarioId: string,
@@ -21,7 +21,7 @@ export class BookingHistoryService {
     statusNovo: Status,
     observacao?: string,
   ): Promise<BookingHistory> {
-    const historico = this.bookingHistoryRepository.create({
+    const registro = this.historicoRepository.create({
       reservaId,
       tipoReserva,
       usuarioId,
@@ -30,11 +30,11 @@ export class BookingHistoryService {
       observacao: observacao || null,
     });
 
-    return await this.bookingHistoryRepository.save(historico);
+    return await this.historicoRepository.save(registro);
   }
 
   async getHistoricoPorReserva(reservaId: string, tipoReserva: ReservaTipo): Promise<BookingHistory[]> {
-    return await this.bookingHistoryRepository.find({
+    return await this.historicoRepository.find({
       where: {
         reservaId,
         tipoReserva,
