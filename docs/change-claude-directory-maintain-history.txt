@@ -1,0 +1,28 @@
+Mudança de diretório sem perder histórico
+
+O que Claude Code usa de histórico
+
+  - Histórico de conversas: ~/.claude/projects/-home-ipolato-lab/ (vinculado ao caminho do diretório)
+  - Memórias pessoais: ~/.claude/projects/ (globais, não mudam com o diretório)
+  - CLAUDE.md no projeto raiz: já existe em /home/ipolato/labControl/CLAUDE.md
+
+Passos para migrar sem perder histórico
+
+1. Copiar o histórico de conversas do projeto
+
+  mkdir -p /home/ipolato/.claude/projects/-home-ipolato-labControl/
+  cp -r /home/ipolato/.claude/projects/-home-ipolato-lab/* /home/ipolato/.claude/projects/-home-ipolato-labControl/
+
+  Isso transfere todos os .jsonl (conversas anteriores) para o novo projeto.
+
+2. Copiar configuração local do projeto (se houver)
+
+  O diretório antigo já não existe mais. Se você tiver qualquer .claude/settings.json no novo diretório, ele já está lá.
+
+3. Renomear/remover o diretório antigo
+
+  rm -rf /home/ipolato/.claude/projects/-home-ipolato-lab/
+
+  Limpa o diretório antigo de conversas.
+
+4. Iniciar Claude no novo diretório

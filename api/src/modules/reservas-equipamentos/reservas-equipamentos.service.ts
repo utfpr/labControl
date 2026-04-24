@@ -76,7 +76,7 @@ export class ReservasEquipamentosService {
       return novaReserva;
     } catch (error) {
       throw new InternalServerErrorException(
-        'Erro ao criar reserva de equipamento. Por favor, tente novamente.',
+        'Erro ao criar reserva de equipamento. Por favor, tente novamente.', error
       );
     }
   }

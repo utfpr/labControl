@@ -5,7 +5,7 @@ import { CriarReservaEquipamentoDto } from './dto/criar-reserva-equipamento.dto'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole, Status, ReservaTipo } from '../../common/enums';
+import { UserRole } from '../../common/enums';
 
 @ApiTags('Reservas de Equipamentos')
 @ApiBearerAuth()
