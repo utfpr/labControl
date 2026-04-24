@@ -42,6 +42,30 @@ describe('HistoricoReservasService', () => {
     historicoRepo = module.get<Repository<BookingHistory>>(getRepositoryToken(BookingHistory));
   });
 
+  describe('getHistoricoPorReserva', () => {
+    it('deve retornar o histórico de uma reserva', async () => {
+      const resultado = await service.getHistoricoPorReserva('reserva-1', ReservaTipo.LOCAL);
+
+      expect(resultado).toEqual([mockBookingHistory]);
+      expect(historicoRepo.find).toHaveBeenCalledWith({
+        where: {
+          reservaId: 'reserva-1',
+          tipoReserva: ReservaTipo.LOCAL,
+        },
+        relations: ['usuario'],
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+    });
+
+    it('deve retornar lista vazia quando não houver histórico', async () => {
+      jest.spyOn(historicoRepo, 'find').mockResolvedValueOnce([]);
+      const resultado = await service.getHistoricoPorReserva('reserva-inexistente', ReservaTipo.LOCAL);
+      expect(resultado).toEqual([]);
+    });
+  });
+
   describe('criarRegistro', () => {
     it('deve criar um registro de histórico', async () => {
       const resultado = await service.criarRegistro(
@@ -83,23 +107,21 @@ describe('HistoricoReservasService', () => {
         observacao: 'Teste de observação',
       });
     });
-  });
 
-  describe('getHistoricoPorReserva', () => {
-    it('deve retornar o histórico de uma reserva', async () => {
-      const resultado = await service.getHistoricoPorReserva('reserva-1', ReservaTipo.LOCAL);
+    it('deve lidar com observacoes muito longas', async () => {
+      const observacaoLonga = 'a'.repeat(10000);
+      await service.criarRegistro(
+        'reserva-1',
+        ReservaTipo.LOCAL,
+        'user-1',
+        Status.PENDENTE,
+        Status.APROVADA,
+        observacaoLonga,
+      );
 
-      expect(resultado).toEqual([mockBookingHistory]);
-      expect(historicoRepo.find).toHaveBeenCalledWith({
-        where: {
-          reservaId: 'reserva-1',
-          tipoReserva: ReservaTipo.LOCAL,
-        },
-        relations: ['usuario'],
-        order: {
-          createdAt: 'DESC',
-        },
-      });
+      expect(historicoRepo.create).toHaveBeenCalledWith(expect.objectContaining({
+        observacao: observacaoLonga,
+      }));
     });
   });
 
@@ -184,6 +206,14 @@ describe('HistoricoReservasService', () => {
       await expect(service.validarTransicao(Status.APROVADA, Status.APROVADA)).rejects.toThrow(
         'Transição de status inválida de "aprovada" para "aprovada".',
       );
+    });
+
+    it('deve lancar erro quando statusAntigo é nulo ou indefinido', async () => {
+      await expect(service.validarTransicao(null as any, Status.APROVADA)).rejects.toThrow();
+    });
+
+    it('deve lancar erro quando statusNovo é nulo ou indefinido', async () => {
+      await expect(service.validarTransicao(Status.PENDENTE, null as any)).rejects.toThrow();
     });
   });
 

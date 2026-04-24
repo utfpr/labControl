@@ -216,6 +216,66 @@ describe('ConflitoReservasService', () => {
       expect(resultado).toBe('Este laboratório já possui uma reserva ativa para este horário.');
     });
 
+    it('deve retornar null quando nova reserva começa exatamente quando a existente termina (touch boundary)', async () => {
+      const mock = createQueryBuilderMock(mockReservaLocal);
+      (reservasLocaisRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkLocalReservaConflito(
+        'local-1',
+        localDt(2026, 4, 1, 12, 0, 0),
+        localDt(2026, 4, 1, 14, 0, 0),
+      );
+      expect(resultado).toBeNull();
+    });
+
+    it('deve retornar null quando nova reserva termina exatamente quando a existente começa (touch boundary)', async () => {
+      const mock = createQueryBuilderMock(mockReservaLocal);
+      (reservasLocaisRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkLocalReservaConflito(
+        'local-1',
+        localDt(2026, 4, 1, 8, 0, 0),
+        localDt(2026, 4, 1, 10, 0, 0),
+      );
+      expect(resultado).toBeNull();
+    });
+
+    it('deve detectar conflito quando nova reserva coincide exatamente com a existente', async () => {
+      const mock = createQueryBuilderMock(mockReservaLocal);
+      (reservasLocaisRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkLocalReservaConflito(
+        'local-1',
+        localDt(2026, 4, 1, 10, 0, 0),
+        localDt(2026, 4, 1, 12, 0, 0),
+      );
+      expect(resultado).toBe('Este laboratório já possui uma reserva ativa para este horário.');
+    });
+
+    it('deve detectar conflito quando nova reserva engloba a existente (encompassing)', async () => {
+      const mock = createQueryBuilderMock(mockReservaLocal);
+      (reservasLocaisRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkLocalReservaConflito(
+        'local-1',
+        localDt(2026, 4, 1, 9, 0, 0),
+        localDt(2026, 4, 1, 13, 0, 0),
+      );
+      expect(resultado).toBe('Este laboratório já possui uma reserva ativa para este horário.');
+    });
+
+    it('deve detectar conflito quando nova reserva está dentro da existente (inside)', async () => {
+      const mock = createQueryBuilderMock(mockReservaLocal);
+      (reservasLocaisRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkLocalReservaConflito(
+        'local-1',
+        localDt(2026, 4, 1, 10, 30, 0),
+        localDt(2026, 4, 1, 11, 30, 0),
+      );
+      expect(resultado).toBe('Este laboratório já possui uma reserva ativa para este horário.');
+    });
+
     it('deve retornar null quando nova reserva é inteiramente antes da existente', async () => {
       const mock = createQueryBuilderMock(null);
       (reservasLocaisRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
@@ -301,6 +361,60 @@ describe('ConflitoReservasService', () => {
       expect(resultado).toBeNull();
     });
 
+    it('deve detectar conflito quando aula engloba a reserva', async () => {
+      // Aula 08-12, Reserva 09-11
+      const aulaLarga = { ...mockAula, horaInicio: '08:00:00', horaFim: '12:00:00' };
+      const mock = createQueryBuilderMock([aulaLarga]);
+      (aulasRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkGradeAulaConflito(
+        'local-1',
+        localDt(2026, 4, 5, 9, 0, 0),
+        localDt(2026, 4, 5, 11, 0, 0),
+      );
+      expect(resultado).toContain('aula cadastrada');
+    });
+
+    it('deve detectar conflito quando reserva engloba a aula', async () => {
+      // Aula 09-10, Reserva 08-11
+      const aulaCurta = { ...mockAula, horaInicio: '09:00:00', horaFim: '10:00:00' };
+      const mock = createQueryBuilderMock([aulaCurta]);
+      (aulasRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkGradeAulaConflito(
+        'local-1',
+        localDt(2026, 4, 5, 8, 0, 0),
+        localDt(2026, 4, 5, 11, 0, 0),
+      );
+      expect(resultado).toContain('aula cadastrada');
+    });
+
+    it('deve retornar null quando reserva começa exatamente quando aula termina', async () => {
+      // Aula 08-10, Reserva 10-12
+      const mock = createQueryBuilderMock([mockAula]);
+      (aulasRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkGradeAulaConflito(
+        'local-1',
+        localDt(2026, 4, 5, 10, 0, 0),
+        localDt(2026, 4, 5, 12, 0, 0),
+      );
+      expect(resultado).toBeNull();
+    });
+
+    it('deve retornar null quando reserva termina exatamente quando aula começa', async () => {
+      // Aula 08-10, Reserva 06-08
+      const mock = createQueryBuilderMock([mockAula]);
+      (aulasRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
+
+      const resultado = await service.checkGradeAulaConflito(
+        'local-1',
+        localDt(2026, 4, 5, 6, 0, 0),
+        localDt(2026, 4, 5, 8, 0, 0),
+      );
+      expect(resultado).toBeNull();
+    });
+
     it('deve considerar o dia da semana corretamente (domingo = 0 -> 7)', async () => {
       let chamadaDiaSemana: number | undefined;
       const mock = {
@@ -347,16 +461,21 @@ describe('ConflitoReservasService', () => {
       expect(chamadaDiaSemana).toBe(1);
     });
 
-    it('deve detectar sobreposição de hora no fim da aula', async () => {
-      // Aula terca 10-12, reserva 09-11 -> cruza 10-11
-      const aulaFim = { ...mockAula, horaInicio: '10:00:00', horaFim: '12:00:00' };
-      const mock = createQueryBuilderMock([aulaFim]);
+    it('deve detectar conflito quando aula atravessa virada de ano e reserva ocorre em janeiro', async () => {
+      // Aula: 2025-12-01 até 2026-01-31, terça-feira, 08-10
+      const aulaAnoNovo = {
+        ...mockAula,
+        data_inicio: '2025-12-01',
+        data_fim: '2026-01-31',
+      };
+      const mock = createQueryBuilderMock([aulaAnoNovo]);
       (aulasRepo.createQueryBuilder as jest.Mock).mockReturnValue(mock);
 
+      // Terça-feira 06 de Janeiro de 2026
       const resultado = await service.checkGradeAulaConflito(
         'local-1',
-        localDt(2026, 4, 5, 9, 0, 0),
-        localDt(2026, 4, 5, 11, 0, 0),
+        localDt(2026, 0, 6, 9, 0, 0),
+        localDt(2026, 0, 6, 11, 0, 0),
       );
       expect(resultado).toContain('aula cadastrada');
     });
