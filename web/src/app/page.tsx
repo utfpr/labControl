@@ -172,7 +172,7 @@ export default function LoginPage() {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">E-mail Institucional</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Mail className="w-5 h-5" /></div>
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><Mail className="w-5 h-5" /></div>
                     <input type="email" required value={emailLogin} onChange={(e) => setEmailLogin(e.target.value)} className="w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl outline-none text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="seu.email@utfpr.edu.br" />
                   </div>
                 </div>
@@ -180,9 +180,9 @@ export default function LoginPage() {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Senha</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Lock className="w-5 h-5" /></div>
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><Lock className="w-5 h-5" /></div>
                     <input type={showSenhaLogin ? "text" : "password"} required value={senhaLogin} onChange={(e) => setSenhaLogin(e.target.value)} className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl outline-none text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="••••••••" />
-                    <button type="button" onClick={() => setShowSenhaLogin(!showSenhaLogin)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <button type="button" onClick={() => setShowSenhaLogin(!showSenhaLogin)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                       {showSenhaLogin ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
@@ -213,7 +213,7 @@ export default function LoginPage() {
                   <div className="col-span-2">
                     <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nome Completo</label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><User className="w-4 h-4" /></div>
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><User className="w-4 h-4" /></div>
                       <input type="text" required value={nome} onChange={(e) => setNome(e.target.value)} className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-blue-500" />
                     </div>
                   </div>
@@ -232,14 +232,14 @@ export default function LoginPage() {
                   <div>
                     <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">RA</label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Hash className="w-4 h-4" /></div>
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><Hash className="w-4 h-4" /></div>
                       <input type="text" required value={ra} onChange={(e) => setRa(e.target.value)} className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-blue-500" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Curso</label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><BookOpen className="w-4 h-4" /></div>
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><BookOpen className="w-4 h-4" /></div>
                       <select required value={cursoId} onChange={(e) => setCursoId(e.target.value)} className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-blue-500 appearance-none">
                         <option value="">Selecione...</option>
                         {cursos.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
@@ -251,7 +251,7 @@ export default function LoginPage() {
                 <div>
                   <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">E-mail Institucional</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Mail className="w-4 h-4" /></div>
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><Mail className="w-4 h-4" /></div>
                     <input type="email" required value={emailReg} onChange={(e) => setEmailReg(e.target.value)} className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-blue-500" />
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export default function LoginPage() {
                   <div>
                     <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Senha</label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Lock className="w-4 h-4" /></div>
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><Lock className="w-4 h-4" /></div>
                       <input type={showSenhaReg ? "text" : "password"} required value={senhaReg} onChange={(e) => setSenhaReg(e.target.value)} className="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-blue-500" />
                       <button type="button" onClick={() => setShowSenhaReg(!showSenhaReg)} className="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
                         {showSenhaReg ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -270,7 +270,7 @@ export default function LoginPage() {
                   <div>
                     <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Confirmar</label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Lock className="w-4 h-4" /></div>
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500"><Lock className="w-4 h-4" /></div>
                       <input type={showConfirmarReg ? "text" : "password"} required value={confirmarSenhaReg} onChange={(e) => setConfirmarSenhaReg(e.target.value)} className="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-blue-500" />
                       <button type="button" onClick={() => setShowConfirmarReg(!showConfirmarReg)} className="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
                         {showConfirmarReg ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -286,7 +286,7 @@ export default function LoginPage() {
                       {arquivo ? (
                         <p className="text-xs font-medium text-blue-500 truncate max-w-[150px]"><FileText className="inline w-3 h-3 mr-1" /> {arquivo.name}</p>
                       ) : (
-                        <p className="text-xs text-slate-500"><Upload className="inline w-3 h-3 mr-1" /> Anexar PDF</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400"><Upload className="inline w-3 h-3 mr-1" /> Anexar PDF</p>
                       )}
                     </div>
                     {/* Validação usando a constante convertida em bytes */}
