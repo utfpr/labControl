@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Usuario } from '../entities/usuario.entity';
 import { Curso } from '../entities/curso.entity';
+import { UserRole } from '../../common/enums';
 
 @Injectable()
 export class AuthService {
@@ -32,12 +33,21 @@ export class AuthService {
       throw new BadRequestException('Curso não encontrado.');
     }
 
-    // 3. Salva o usuário (A senha será criptografada automaticamente pelo @BeforeInsert na Entidade)
+    // 3. Determina a role com base no flag isDocente
+    const role = dados.isDocente ? UserRole.PROFESSOR : UserRole.COMUM;
+
+    // 4. Validação de comprovante: obrigatório para alunos (COMUM)
+    if (role === UserRole.COMUM && !caminhoComprovante) {
+      throw new BadRequestException('Comprovante de matrícula é obrigatório para estudantes.');
+    }
+
+    // 5. Salva o usuário (A senha será criptografada automaticamente pelo @BeforeInsert na Entidade)
     const novoUsuario = this.usuarioRepository.create({
       nome: dados.nome,
       ra: dados.ra,
       email: dados.email,
-      senha: dados.senha, 
+      senha: dados.senha,
+      role: role,
       comprovanteMatricula: caminhoComprovante,
       curso: { id: curso.id }, // Relacionamento
     } as unknown as Usuario);

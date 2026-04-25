@@ -2,6 +2,7 @@ export enum UserRole {
   COMUM = 'comum',
   SUPERVISOR = 'supervisor',
   ADMIN = 'admin',
+  PROFESSOR = 'professor',
 }
 
 export enum ReservaTipo {

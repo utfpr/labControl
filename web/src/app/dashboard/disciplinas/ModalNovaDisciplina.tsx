@@ -13,7 +13,7 @@ export default function ModalNovaDisciplina({ isOpen, onClose, onSuccess }: Moda
   const [professores, setProfessores] = useState<any[]>([]);
   const [nome, setNome] = useState("");
   const [responsavelId, setResponsavelId] = useState("");
-  
+
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
 
@@ -27,8 +27,8 @@ export default function ModalNovaDisciplina({ isOpen, onClose, onSuccess }: Moda
           });
           if (response.ok) {
             const data = await response.json();
-            // Filtramos apenas os usuários ativos para aparecerem na lista
-            setProfessores(data.filter((u: any) => u.status === 'ATIVO'));
+            // Filtramos apenas supervisores e professores ativos para aparecerem na lista
+            setProfessores(data.filter((u: any) => u.status === 'ATIVO' && (u.role === 'professor' || u.role === 'supervisor')));
           }
         } catch (error) {
           setErro("Erro ao buscar a lista de responsáveis.");
@@ -56,9 +56,9 @@ export default function ModalNovaDisciplina({ isOpen, onClose, onSuccess }: Moda
 
       const response = await fetch("http://localhost:3000/disciplinas", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` 
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
@@ -68,7 +68,7 @@ export default function ModalNovaDisciplina({ isOpen, onClose, onSuccess }: Moda
       if (!response.ok) throw new Error(data.message || "Erro ao cadastrar disciplina");
 
       onSuccess();
-    } catch (err: any) { 
+    } catch (err: any) {
       setErro(err.message);
     } finally {
       setLoading(false);
@@ -90,13 +90,13 @@ export default function ModalNovaDisciplina({ isOpen, onClose, onSuccess }: Moda
 
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome da Disciplina *</label>
-            <input 
-              type="text" 
-              required 
-              value={nome} 
-              onChange={(e) => setNome(e.target.value)} 
+            <input
+              type="text"
+              required
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
               placeholder="Ex: Banco de Dados I"
-              className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-teal-500 text-sm" 
+              className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-teal-500 text-sm"
             />
           </div>
 
