@@ -76,26 +76,27 @@ export default function ModalEditarUsuario({ isOpen, onClose, onSuccess, usuario
           {erro && <div className="p-3 bg-red-50 text-red-700 text-sm rounded">{erro}</div>}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Nome</label>
-            <input type="text" required value={nome} onChange={(e) => setNome(e.target.value)} className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:border-blue-500" />
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome</label>
+            <input type="text" required value={nome} onChange={(e) => setNome(e.target.value)} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none focus:border-blue-500 text-slate-900 dark:text-white" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">RA / Matrícula</label>
-            <input type="text" required value={ra} onChange={(e) => setRa(e.target.value)} className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:border-blue-500" />
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">RA / Matrícula</label>
+            <input type="text" required value={ra} onChange={(e) => setRa(e.target.value)} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none focus:border-blue-500 text-slate-900 dark:text-white" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Permissão de Acesso</label>
-            <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:border-blue-500">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Permissão de Acesso</label>
+            <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none focus:border-blue-500 text-slate-900 dark:text-white">
               <option value="ALUNO">Aluno (Acesso Padrão)</option>
+              <option value="PROFESSOR">Professor (Acesso Docente)</option>
               <option value="SUPERVISOR">Supervisor (Gere Reservas e Aprovações)</option>
               <option value="ADMIN">Administrador (Acesso Total)</option>
             </select>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-            <button type="button" onClick={onClose} disabled={loading} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-lg">Cancelar</button>
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" onClick={onClose} disabled={loading} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400">Cancelar</button>
             <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
               {loading ? "Salvando..." : "Salvar"}
             </button>

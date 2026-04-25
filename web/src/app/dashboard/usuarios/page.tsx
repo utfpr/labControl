@@ -198,7 +198,7 @@ export default function GestaoUsuariosPage() {
                     <td className="p-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-slate-600">{user.curso?.nome || "-"}</span>
-                        <span className={`text-xs font-bold mt-1 ${user.role === 'ADMIN' ? 'text-purple-600' : user.role === 'SUPERVISOR' ? 'text-blue-600' : 'text-slate-400'}`}>
+                        <span className={`text-xs font-bold mt-1 ${user.role === 'ADMIN' ? 'text-purple-600' : user.role === 'SUPERVISOR' ? 'text-blue-600' : user.role === 'PROFESSOR' ? 'text-indigo-600' : 'text-slate-400'}`}>
                           {user.role}
                         </span>
                       </div>

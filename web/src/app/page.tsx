@@ -32,6 +32,7 @@ export default function LoginPage() {
   const [ra, setRa] = useState("");
   const [cursoId, setCursoId] = useState("");
   const [arquivo, setArquivo] = useState<File | null>(null);
+  const [isDocente, setIsDocente] = useState(false);
 
   // Estados de Visibilidade das Senhas no Registro
   const [showSenhaReg, setShowSenhaReg] = useState(false);
@@ -95,7 +96,7 @@ export default function LoginPage() {
     if (senhaReg !== confirmarSenhaReg) return setErro("As senhas digitadas não coincidem.");
 
     if (!cursoId) return setErro("Selecione um curso.");
-    if (!arquivo) return setErro("O comprovante de matrícula é obrigatório.");
+    if (!arquivo && !isDocente) return setErro("O comprovante de matrícula é obrigatório.");
 
     setLoading(true);
 
@@ -106,7 +107,8 @@ export default function LoginPage() {
       formData.append("senha", senhaReg);
       formData.append("ra", ra);
       formData.append("cursoId", cursoId);
-      formData.append("file", arquivo);
+      formData.append("isDocente", String(isDocente));
+      if (arquivo) formData.append("file", arquivo);
 
       const response = await fetch("http://localhost:3000/usuarios/registrar", {
         method: "POST",
@@ -214,6 +216,18 @@ export default function LoginPage() {
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><User className="w-4 h-4" /></div>
                       <input type="text" required value={nome} onChange={(e) => setNome(e.target.value)} className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg outline-none text-slate-900 dark:text-white focus:border-blue-500" />
                     </div>
+                  </div>
+                  <div className="col-span-2 flex items-center gap-2 py-1">
+                    <input
+                      type="checkbox"
+                      id="isDocente"
+                      checked={isDocente}
+                      onChange={(e) => setIsDocente(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="isDocente" className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+                      Sou Docente UTFPR
+                    </label>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">RA</label>

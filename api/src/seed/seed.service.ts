@@ -53,7 +53,7 @@ export class SeedService implements OnApplicationBootstrap {
     for (let i = 0; i < cursos.length; i++) {
       const discData = disciplinasPorCurso[i].map(nome => ({
         nome,
-        responsavel: null // Definiremos depois com um supervisor
+        responsavel: null // Definiremos depois com um professor
       }));
       const savedDiscs = await Promise.all(
         discData.map(d => this.disciplinaRepo.save(this.disciplinaRepo.create(d)))
@@ -89,6 +89,20 @@ export class SeedService implements OnApplicationBootstrap {
       })));
     }
 
+    // Professores (Ex: 3 professores para distribuir entre disciplinas)
+    const professores = [];
+    for (let i = 1; i <= 3; i++) {
+      professores.push(await this.usuarioRepo.save(this.usuarioRepo.create({
+        nome: `Professor ${i}`,
+        ra: `prof00${i}`,
+        email: `professor${i}@lab.com`,
+        senha: senhaPadrao,
+        role: UserRole.PROFESSOR,
+        status: 'ATIVO',
+        curso: cursos[i % cursos.length]
+      })));
+    }
+
     // Alunos Ativos (5)
     const alunosAtivos = [];
     for (let i = 1; i <= 5; i++) {
@@ -117,10 +131,10 @@ export class SeedService implements OnApplicationBootstrap {
       })));
     }
 
-    // Vincular responsáveis às disciplinas (usando supervisores)
+    // Vincular responsáveis às disciplinas (Agora usando professores)
     for (let i = 0; i < allDisciplinas.length; i++) {
       const disc = allDisciplinas[i];
-      disc.responsavel = supervisores[i % supervisores.length];
+      disc.responsavel = professores[i % professores.length];
       await this.disciplinaRepo.save(disc);
     }
 
@@ -158,12 +172,12 @@ export class SeedService implements OnApplicationBootstrap {
     // 6. Aulas Alocadas (Exemplos durante a semana)
     // Dia da semana: 1 (Segunda) a 7 (Domingo)
     const aulasData = [
-      { disciplina: allDisciplinas[0], local: locais[0], professor: supervisores[0], diaSemana: 1, horaInicio: '08:00:00', horaFim: '10:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
-      { disciplina: allDisciplinas[1], local: locais[0], professor: supervisores[0], diaSemana: 1, horaInicio: '10:00:00', horaFim: '12:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
-      { disciplina: allDisciplinas[5], local: locais[1], professor: supervisores[1], diaSemana: 2, horaInicio: '13:00:00', horaFim: '15:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
-      { disciplina: allDisciplinas[6], local: locais[1], professor: supervisores[1], diaSemana: 2, horaInicio: '15:00:00', horaFim: '17:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
-      { disciplina: allDisciplinas[10], local: locais[2], professor: supervisores[0], diaSemana: 3, horaInicio: '08:00:00', horaFim: '12:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
-      { disciplina: allDisciplinas[11], local: locais[2], professor: supervisores[1], diaSemana: 4, horaInicio: '18:00:00', horaFim: '22:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
+      { disciplina: allDisciplinas[0], local: locais[0], professor: professores[0], diaSemana: 1, horaInicio: '08:00:00', horaFim: '10:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
+      { disciplina: allDisciplinas[1], local: locais[0], professor: professores[0], diaSemana: 1, horaInicio: '10:00:00', horaFim: '12:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
+      { disciplina: allDisciplinas[5], local: locais[1], professor: professores[1], diaSemana: 2, horaInicio: '13:00:00', horaFim: '15:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
+      { disciplina: allDisciplinas[6], local: locais[1], professor: professores[1], diaSemana: 2, horaInicio: '15:00:00', horaFim: '17:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
+      { disciplina: allDisciplinas[10], local: locais[2], professor: professores[0], diaSemana: 3, horaInicio: '08:00:00', horaFim: '12:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
+      { disciplina: allDisciplinas[11], local: locais[2], professor: professores[1], diaSemana: 4, horaInicio: '18:00:00', horaFim: '22:00:00', dataInicio: '2026-01-01', dataFim: '2026-06-30' },
     ];
 
     await this.aulaRepo.save(
