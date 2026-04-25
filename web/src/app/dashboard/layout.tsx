@@ -94,6 +94,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span className="hidden sm:block">Meu Perfil</span>
             </button>
             <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 transition-colors"
+                title="Alternar Tema"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-5 h-5 text-amber-500" />
+                ) : (
+                  <Moon className="w-5 h-5 text-blue-500" />
+                )}
+                <span className="hidden sm:block">{theme === "dark" ? "Modo Claro" : "Modo Escuro"}</span>
+              </button>
+            )}
+            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
             <button onClick={handleLogout} className="text-slate-500 hover:text-red-500 transition-colors">
               <LogOut className="w-5 h-5" />
             </button>
