@@ -13,11 +13,11 @@
   "scripts": {
     "prepare": "husky",
     "commit": "cz",
-    "services:api": "docker compose -f api/docker-compose.yml up -d && docker logs -f api_nestjs",
-    "services:down": "docker compose -f api/docker-compose.yml down",
-    "services:clean": "docker compose -f api/docker-compose.yml down -v",
-    "services:logs": "docker logs -f api_nestjs",
-    "services:web":  "cd web && yarn dev"
+    "server:api": "docker compose -f api/docker-compose.yml up -d && docker logs -f api_nestjs",
+    "server:down": "docker compose -f api/docker-compose.yml down",
+    "server:clean": "docker compose -f api/docker-compose.yml down -v",
+    "server:logs": "docker logs -f api_nestjs",
+    "server:web":  "cd web && yarn dev"
   },
   "lint-staged": {
     "api/**/*.ts": [

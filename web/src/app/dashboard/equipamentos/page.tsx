@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Monitor, Pencil, Trash2, AlertCircle, FileText } from "lucide-react";
+import { Plus, Monitor, Pencil, Trash2, AlertCircle, FileText, Search, ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ModalNovoEquipamento from "./ModalNovoEquipamento";
 import ModalConfirmacao from "./ModalConfirmacao";
+import { useTableOperations } from "@/hooks/useTableOperations";
 
 interface Equipamento {
   id: string;
@@ -31,6 +32,14 @@ export default function EquipamentosPage() {
   // Controle do Modal de Aviso (Para quando o POP não existe)
   const [modalInfoAberto, setModalInfoAberto] = useState(false);
   const [modalInfoProps, setModalInfoProps] = useState({ titulo: "", msg: "" });
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    sortConfig,
+    requestSort,
+    filteredAndSortedData: dataList
+  } = useTableOperations(equipamentos);
 
   const router = useRouter();
 
@@ -112,10 +121,20 @@ export default function EquipamentosPage() {
     <div className="max-w-7xl mx-auto space-y-6">
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
             <Monitor className="w-6 h-6 text-blue-500" /> Equipamentos
           </h1>
+          <div className="relative flex-1 sm:flex-none">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Buscar equipamento..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:w-64 pl-9 pr-3 py-2 text-sm bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:border-blue-500 text-slate-900 dark:text-white transition-all"
+            />
+          </div>
         </div>
 
         <button onClick={abrirModalNovo} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
@@ -133,18 +152,28 @@ export default function EquipamentosPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 text-sm text-slate-500 uppercase tracking-wider">
-                  <th className="p-4 font-semibold">Patrimônio</th>
-                  <th className="p-4 font-semibold">Nome</th>
-                  <th className="p-4 font-semibold">Local</th>
+              <thead className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 text-sm text-slate-500 uppercase tracking-wider">
+                  <th className="p-4 font-semibold cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors" onClick={() => requestSort('patrimonio')}>
+                    <div className="flex items-center gap-1">
+                      Patrimônio {sortConfig?.key === 'patrimonio' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    </div>
+                  </th>
+                  <th className="p-4 font-semibold cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors" onClick={() => requestSort('nome')}>
+                    <div className="flex items-center gap-1">
+                      Nome {sortConfig?.key === 'nome' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    </div>
+                  </th>
+                  <th className="p-4 font-semibold cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors" onClick={() => requestSort('local.nome')}>
+                    <div className="flex items-center gap-1">
+                      Local {sortConfig?.key === 'local.nome' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    </div>
+                  </th>
                   <th className="p-4 font-semibold text-center">POP</th>
                   <th className="p-4 font-semibold">Status</th>
                   <th className="p-4 font-semibold text-right">Ações</th>
-                </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {equipamentos.map((eq) => (
+                {dataList.map((eq) => (
                   <tr key={eq.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="p-4 text-sm text-slate-600 dark:text-slate-300">{eq.patrimonio}</td>
                     <td className="p-4 text-sm font-semibold text-slate-800 dark:text-white">{eq.nome}</td>
