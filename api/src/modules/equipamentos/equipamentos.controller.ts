@@ -80,6 +80,12 @@ export class EquipamentosController {
     return this.equipamentosService.remover(id);
   }
 
+  @Get('stats')
+  @ApiOperation({ summary: 'Retorna estatísticas de contagem por status' })
+  async getStats() {
+    return this.equipamentosService.countByStatus();
+  }
+
   @Patch(':id/pop')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @UseInterceptors(FileInterceptor('arquivo', multerPdfConfig))

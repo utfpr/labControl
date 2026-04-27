@@ -43,7 +43,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 overflow-hidden">
       <aside className={`bg-[#0f172a] text-slate-300 w-64 flex-shrink-0 flex flex-col transition-transform absolute inset-y-0 left-0 md:relative md:translate-x-0 z-50 ${menuAberto ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-32 flex items-center justify-center px-6 bg-[#0b1120] font-bold text-xl text-white tracking-wider border-b border-slate-800 flex-shrink-0">
-          <img src="/logo-labControl-dark.png" alt="LabControl Logo" className="h-24 w-auto object-contain" />
+          {/* <img src="/logo-labControl-dark.png" alt="LabControl Logo" className="h-24 w-auto object-contain" /> */}
+          <img src={theme === 'dark' ? "/logo-labControl-light.png" : "/logo-labControl-dark.png"} alt="LabControl Logo" className="h-24 w-auto object-contain" />
         </div>
 
         <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">

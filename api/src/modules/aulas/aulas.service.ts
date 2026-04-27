@@ -54,4 +54,12 @@ export class AulasService {
       order: { dataInicio: 'DESC' } // Lista as mais recentes primeiro
     });
   }
+
+  async countByStatus(): Promise<{ confirmadas: number; canceladas: number }> {
+    const total = await this.aulasRepository.count();
+    // Como Aulas não têm um campo 'status' explícito no modelo atual,
+    // vamos considerar todas as aulas cadastradas como 'confirmadas'.
+    // Caso haja um campo de status no futuro, essa lógica será atualizada.
+    return { confirmadas: total, canceladas: 0 };
+  }
 }

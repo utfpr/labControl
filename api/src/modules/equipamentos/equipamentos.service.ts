@@ -61,11 +61,36 @@ export class EquipamentosService {
     await this.equipamentosRepository.remove(equipamento);
   }
 
+  async remover(id: string): Promise<void> {
+    const equipamento = await this.equipamentosRepository.findOneBy({ id });
+    if (!equipamento) throw new NotFoundException('Equipamento não encontrado.');
+
+    await this.equipamentosRepository.remove(equipamento);
+  }
+
   async atualizarPop(id: string, caminhoArquivo: string): Promise<Equipamento> {
     const equipamento = await this.equipamentosRepository.findOneBy({ id });
     if (!equipamento) throw new NotFoundException('Equipamento não encontrado.');
 
     equipamento.arquivoPop = caminhoArquivo;
     return await this.equipamentosRepository.save(equipamento);
+  }
+
+  async countByStatus(): Promise<{ normal: number; manutencao: number; quebrado: number }> {
+    const statusCounts = await this.equipamentosRepository
+      .createQueryBuilder('equipamento')
+      .select('equipamento.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('equipamento.status')
+      .getRawMany();
+
+    const stats = { normal: 0, manutencao: 0, quebrado: 0 };
+    statusCounts.forEach((row: any) => {
+      if (row.status === 'normal') stats.normal = Number(row.count);
+      if (row.status === 'manutencao') stats.manutencao = Number(row.count);
+      if (row.status === 'quebrado') stats.quebrado = Number(row.count);
+    });
+
+    return stats;
   }
 }

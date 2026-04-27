@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req, Query, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ReservasEquipamentosService } from './reservas-equipamentos.service';
 import { CriarReservaEquipamentoDto } from './dto/criar-reserva-equipamento.dto';
@@ -68,5 +68,18 @@ export class ReservasEquipamentosController {
   @ApiOperation({ summary: 'Consulta o histórico de status de uma reserva de equipamento' })
   async getHistorico(@Param('id') id: string) {
     return this.reservasEquipamentosService.getHistoricoPorReserva(id);
+  }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Retorna estatísticas de contagem por status' })
+  async getStats() {
+    return this.reservasEquipamentosService.countByStatus();
+  }
+
+  @Get('agenda')
+  @ApiOperation({ summary: 'Busca reservas para uma data específica' })
+  async getAgenda(@Query('date') date: string) {
+    if (!date) throw new BadRequestException('A data é obrigatória (YYYY-MM-DD).');
+    return this.reservasEquipamentosService.buscarPorData(date);
   }
 }

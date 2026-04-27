@@ -153,6 +153,7 @@ export default function EquipamentosPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 text-sm text-slate-500 uppercase tracking-wider">
+                <tr>
                   <th className="p-4 font-semibold cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors" onClick={() => requestSort('patrimonio')}>
                     <div className="flex items-center gap-1">
                       Patrimônio {sortConfig?.key === 'patrimonio' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
@@ -171,6 +172,7 @@ export default function EquipamentosPage() {
                   <th className="p-4 font-semibold text-center">POP</th>
                   <th className="p-4 font-semibold">Status</th>
                   <th className="p-4 font-semibold text-right">Ações</th>
+                </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {dataList.map((eq) => (

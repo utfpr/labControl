@@ -87,6 +87,7 @@ export default function DisciplinasPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 text-sm text-slate-500 uppercase tracking-wider">
+                <tr>
                   <th className="p-4 font-semibold cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors" onClick={() => requestSort('nome')}>
                     <div className="flex items-center gap-1">
                       Nome da Disciplina {sortConfig?.key === 'nome' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
@@ -97,6 +98,7 @@ export default function DisciplinasPage() {
                       Professor Responsável {sortConfig?.key === 'responsavel.nome' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </div>
                   </th>
+                </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {dataList.map((d) => (
