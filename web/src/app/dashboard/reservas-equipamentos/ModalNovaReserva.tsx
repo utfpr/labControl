@@ -59,8 +59,8 @@ export default function ModalNovaReserva({ isOpen, onClose, onSuccess }: ModalPr
       // Converte os inputs de data local para o formato ISO que o backend espera
       const payload = {
         equipamentoId,
-        dataInicio: new Date(dataInicio).toISOString(),
-        dataFim: new Date(dataFim).toISOString(),
+        dataHoraInicio: new Date(dataInicio).toISOString(),
+        dataHoraFim: new Date(dataFim).toISOString(),
         motivo
       };
 

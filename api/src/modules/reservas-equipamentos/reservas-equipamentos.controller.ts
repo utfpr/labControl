@@ -18,7 +18,7 @@ export class ReservasEquipamentosController {
   @ApiOperation({ summary: 'Cria uma nova solicitação de reserva de equipamento' })
   async criar(@Body() dados: CriarReservaEquipamentoDto, @Req() req: any) {
     // Caso o front não envie o ID, pegamos do Token JWT por segurança
-    const solicitanteId = dados.solicitanteId || req.user.sub;
+    const solicitanteId = dados.solicitanteId || req.user.id;
     return this.reservasEquipamentosService.criar({ ...dados, solicitanteId });
   }
 
@@ -32,35 +32,35 @@ export class ReservasEquipamentosController {
   @Get('minhas')
   @ApiOperation({ summary: 'Lista as reservas do utilizador logado' })
   async listarMinhasReservas(@Req() req: any) {
-    // req.user.sub contém o ID do utilizador inserido pelo JWT Guard
-    return this.reservasEquipamentosService.listarMinhasReservas(req.user.sub);
+    // req.user.id contém o ID do utilizador inserido pelo JWT Guard
+    return this.reservasEquipamentosService.listarMinhasReservas(req.user.id);
   }
 
   @Patch(':id/aprovar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Aprova uma reserva pendente' })
   async aprovar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasEquipamentosService.aprovar(id, req.user.sub);
+    return this.reservasEquipamentosService.aprovar(id, req.user.id);
   }
 
   @Patch(':id/rejeitar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Rejeita uma reserva pendente' })
   async rejeitar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasEquipamentosService.rejeitar(id, req.user.sub);
+    return this.reservasEquipamentosService.rejeitar(id, req.user.id);
   }
 
   @Patch(':id/cancelar')
   @ApiOperation({ summary: 'Cancela a reserva (Pode ser feito pelo próprio utilizador)' })
   async cancelar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasEquipamentosService.cancelar(id, req.user.sub, req.user.sub);
+    return this.reservasEquipamentosService.cancelar(id, req.user.id, req.user.id);
   }
 
   @Patch(':id/finalizar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Marca a reserva como concluída/devolvida' })
   async finalizar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasEquipamentosService.finalizar(id, req.user.sub);
+    return this.reservasEquipamentosService.finalizar(id, req.user.id);
   }
 
   @Get(':id/historico')
