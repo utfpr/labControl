@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { ReservaEquipamento } from '../entities/reserva.equipamento.entity';
 import { Usuario } from '../entities/usuario.entity';
 import { Equipamento } from '../entities/equipamento.entity';
@@ -209,5 +209,36 @@ export class ReservasEquipamentosService {
 
     reserva.status = novoStatus;
     return await this.reservasEquipamentosRepository.save(reserva);
+  }
+
+  async countByStatus(): Promise<{ confirmadas: number; pendentes: number }> {
+    const statusCounts = await this.reservasEquipamentosRepository
+      .createQueryBuilder('reserva')
+      .select('reserva.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('reserva.status')
+      .getRawMany();
+
+    const stats = { confirmadas: 0, pendentes: 0 };
+    statusCounts.forEach((row: any) => {
+      if (row.status === Status.APROVADA) stats.confirmadas = Number(row.count);
+      if (row.status === Status.PENDENTE) stats.pendentes = Number(row.count);
+    });
+
+    return stats;
+  }
+
+  async buscarPorData(data: string): Promise<ReservaEquipamento[]> {
+    const startOfDay = new Date(data);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(data);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    return await this.reservasEquipamentosRepository.find({
+      where: {
+        dataHoraInicio: Between(startOfDay, endOfDay)
+      },
+      relations: ['solicitante', 'equipamento']
+    });
   }
 }

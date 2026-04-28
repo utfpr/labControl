@@ -27,4 +27,10 @@ export class AulasController {
   async listarTodas() {
     return this.aulasService.listarTodas();
   }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Retorna estatísticas de contagem de aulas' })
+  async getStats() {
+    return this.aulasService.countByStatus();
+  }
 }

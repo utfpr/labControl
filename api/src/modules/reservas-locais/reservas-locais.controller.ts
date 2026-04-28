@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req, Query, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ReservasLocaisService } from './reservas-locais.service';
 import { CriarReservaLocalDto } from './dto/criar-reserva-local.dto';
@@ -18,9 +18,10 @@ export class ReservasLocaisController {
   @ApiOperation({ summary: 'Cria uma nova solicitação de reserva de local' })
   async criar(@Body() dados: CriarReservaLocalDto, @Req() req: any) {
     // Garante que o solicitante seja quem está logado, caso não venha no body
-    const solicitanteId = dados.solicitanteId || req.user.sub;
+    const solicitanteId = dados.solicitanteId || req.user.id;
     return this.reservasLocaisService.criar({ ...dados, solicitanteId });
   }
+
 
   @Get()
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
@@ -32,34 +33,34 @@ export class ReservasLocaisController {
   @Get('minhas')
   @ApiOperation({ summary: 'Lista as reservas de local do utilizador logado' })
   async listarMinhasReservas(@Req() req: any) {
-    return this.reservasLocaisService.listarMinhasReservas(req.user.sub);
+    return this.reservasLocaisService.listarMinhasReservas(req.user.id);
   }
 
   @Patch(':id/aprovar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Aprova uma reserva de local pendente' })
   async aprovar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasLocaisService.aprovar(id, req.user.sub);
+    return this.reservasLocaisService.aprovar(id, req.user.id);
   }
 
   @Patch(':id/rejeitar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Rejeita uma reserva de local pendente' })
   async rejeitar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasLocaisService.rejeitar(id, req.user.sub);
+    return this.reservasLocaisService.rejeitar(id, req.user.id);
   }
 
   @Patch(':id/cancelar')
   @ApiOperation({ summary: 'Cancela a reserva de local (Pode ser feito pelo solicitante)' })
   async cancelar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasLocaisService.cancelar(id, req.user.sub, req.user.sub);
+    return this.reservasLocaisService.cancelar(id, req.user.id, req.user.id);
   }
 
   @Patch(':id/finalizar')
   @Roles(UserRole.ADMIN, UserRole.SUPERVISOR)
   @ApiOperation({ summary: 'Marca a reserva de local como finalizada' })
   async finalizar(@Param('id') id: string, @Req() req: any) {
-    return this.reservasLocaisService.finalizar(id, req.user.sub);
+    return this.reservasLocaisService.finalizar(id, req.user.id);
   }
 
   @Get(':id/historico')
@@ -67,5 +68,18 @@ export class ReservasLocaisController {
   @ApiOperation({ summary: 'Consulta o histórico de status de uma reserva de local' })
   async getHistorico(@Param('id') id: string) {
     return this.reservasLocaisService.getHistoricoPorReserva(id);
+  }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Retorna estatísticas de contagem por status' })
+  async getStats() {
+    return this.reservasLocaisService.countByStatus();
+  }
+
+  @Get('agenda')
+  @ApiOperation({ summary: 'Busca reservas para uma data específica' })
+  async getAgenda(@Query('date') date: string) {
+    if (!date) throw new BadRequestException('A data é obrigatória (YYYY-MM-DD).');
+    return this.reservasLocaisService.buscarPorData(date);
   }
 }

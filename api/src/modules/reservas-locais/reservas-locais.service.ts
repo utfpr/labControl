@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { ReservaLocal } from '../entities/reserva.local.entity';
 import { Usuario } from '../entities/usuario.entity';
 import { Local } from '../entities/local.entity';
@@ -197,10 +197,69 @@ export class ReservasLocaisService {
     return novaReserva;
   }
 
+  async cancelar(
+    id: string,
+    usuarioId: string,
+    userId: string,
+  ): Promise<ReservaLocal> {
+    const reserva = await this.obterReserva(id);
+
+    await this.historicoReservasService.validarTransicaoCancelamentoUsuario(
+      reserva.status,
+      userId,
+      reserva,
+    );
+
+    const statusAntigo = reserva.status;
+    reserva.status = Status.CANCELADA;
+    const novaReserva = await this.reservasLocaisRepository.save(reserva);
+
+    await this.historicoReservasService.criarRegistro(
+      reserva.id,
+      ReservaTipo.LOCAL,
+      usuarioId,
+      statusAntigo,
+      Status.CANCELADA,
+    );
+
+    return novaReserva;
+  }
+
   async getHistoricoPorReserva(reservaId: string) {
     return this.historicoReservasService.getHistoricoPorReserva(
       reservaId,
       ReservaTipo.LOCAL,
     );
+  }
+
+  async countByStatus(): Promise<{ confirmadas: number; pendentes: number }> {
+    const statusCounts = await this.reservasLocaisRepository
+      .createQueryBuilder('reserva')
+      .select('reserva.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('reserva.status')
+      .getRawMany();
+
+    const stats = { confirmadas: 0, pendentes: 0 };
+    statusCounts.forEach((row: any) => {
+      if (row.status === Status.APROVADA) stats.confirmadas = Number(row.count);
+      if (row.status === Status.PENDENTE) stats.pendentes = Number(row.count);
+    });
+
+    return stats;
+  }
+
+  async buscarPorData(data: string): Promise<ReservaLocal[]> {
+    const startOfDay = new Date(data);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(data);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    return await this.reservasLocaisRepository.find({
+      where: {
+        dataHoraInicio: Between(startOfDay, endOfDay)
+      },
+      relations: ['solicitante', 'local']
+    });
   }
 }

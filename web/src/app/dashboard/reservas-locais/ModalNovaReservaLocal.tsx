@@ -56,8 +56,8 @@ export default function ModalNovaReservaLocal({ isOpen, onClose, onSuccess }: Mo
 
       const payload = {
         localId,
-        dataInicio: new Date(dataInicio).toISOString(),
-        dataFim: new Date(dataFim).toISOString(),
+        dataHoraInicio: new Date(dataInicio).toISOString(),
+        dataHoraFim: new Date(dataFim).toISOString(),
         motivo
       };
 
