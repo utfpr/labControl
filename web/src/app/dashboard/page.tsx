@@ -116,10 +116,27 @@ export default function DashboardPage() {
         {/* COLUNA ESQUERDA: Resumos */}
         <div className="lg:col-span-4 space-y-6">
 
-          {/* Card: Equipamentos */}
+          {/* Card: Reservas de Locais */}
           <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 border-b pb-2">Equipamentos</h2>
+            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 border-b pb-2">Reservas de Locais</h2>
+            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
+              <span>Reservas Confirmadas: <strong>{resLocStats.confirmadas}</strong><br />
+                Reservas Pendentes: <strong>{resLocStats.pendentes}</strong></span>
+            </div>
+          </div>
 
+          {/* Card: Reservas de Equipamentos */}
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 border-b pb-2">Reservas de Equipamentos</h2>
+            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
+              <span>Confirmadas: <strong>{resEqStats.confirmadas}</strong><br />
+                Pendentes: <strong>{resEqStats.pendentes}</strong></span>
+            </div>
+          </div>
+
+          {/* Card: Status de Equipamentos */}
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 border-b pb-2">Status Equipamentos</h2>
             <div className="grid grid-cols-3 gap-2 mb-4 text-center">
               <div className="bg-emerald-50 rounded-lg p-2 border border-emerald-100">
                 <p className="text-2xl font-bold text-emerald-600">{eqStats.normal}</p>
@@ -134,30 +151,17 @@ export default function DashboardPage() {
                 <p className="text-xs text-rose-800 font-medium">Quebrados</p>
               </div>
             </div>
-
-            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
-              <span>Confirmadas: <strong>{resEqStats.confirmadas}</strong></span>
-              <span>Pendentes: <strong>{resEqStats.pendentes}</strong></span>
-            </div>
           </div>
 
-          {/* Card: Locais */}
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 border-b pb-2">Locais</h2>
-            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
-              <span>Reservas Confirmadas: <strong>{resLocStats.confirmadas}</strong></span>
-              <span>Reservas Pendentes: <strong>{resLocStats.pendentes}</strong></span>
-            </div>
-          </div>
 
-          {/* Card: Aulas */}
+          {/* Card: Aulas
           <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4 border-b pb-2">Aulas</h2>
             <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
               <span>Confirmadas: <strong>{aulaStats.confirmadas}</strong></span>
               <span>Canceladas: <strong>{aulaStats.canceladas}</strong></span>
             </div>
-          </div>
+          </div> */}
 
         </div>
 
@@ -186,14 +190,20 @@ export default function DashboardPage() {
                   <div className={`w-3 h-3 rounded-full mt-1.5 flex-shrink-0 shadow-sm ${item.tipo === 'local' ? 'bg-amber-500' : 'bg-teal-500'}`}></div>
                   <div>
                     <p className="text-sm font-semibold text-slate-800 dark:text-white">
-                      [{item.solicitante?.id || 'N/A'} - {item.solicitante?.nome || 'Usuário'}]
+                      {/* [{item.tipo === 'local' ? `Local: ${item.local?.nome}` : `Equipamento: ${item.equipamento?.nome} (${item.equipamento?.patrimonio})`}] */}
+                      [{item.tipo === 'local' ? `Local: ${item.local?.nome}` : `Equipamento: ${item.equipamento?.nome}`}]
                     </p>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {item.tipo === 'local' ? `Local: ${item.local?.nome}` : `Equipamento: ${item.equipamento?.nome} (${item.equipamento?.patrimonio})`}
+                      {/* [{item.solicitante?.id || 'N/A'} - {item.solicitante?.nome || 'Usuário'}] */}
+                      Horário: {item.horaInicio} até {item.horaFim}
                     </p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {/* [{item.solicitante?.id || 'N/A'} - {item.solicitante?.nome || 'Usuário'}] */}
+                      {item.solicitante?.nome || 'Usuário'}
+                    </p>
+                    {/* <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                       Das {item.horaInicio} até {item.horaFim}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               ))
