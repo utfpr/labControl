@@ -8,14 +8,14 @@ export default function ReservasPage() {
   const [activeTab, setActiveTab] = useState<'locais' | 'equipamentos'>('locais');
 
   return (
-    <<divdiv className="max-w-7xl mx-auto space-y-6 p-4 sm:p-6">
-      <<divdiv className="flex flex-col gap-4">
-        <<hh1 className="text-3xl font-bold text-slate-800 dark:text-white">
+    <div className="max-w-7xl mx-auto space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
           Gestão de Reservas
         </h1>
 
-        <<divdiv className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-fit">
-          <<buttonbutton
+        <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-fit">
+          <button
             onClick={() => setActiveTab('locais')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
               activeTab === 'locais'
@@ -25,7 +25,7 @@ export default function ReservasPage() {
           >
             Laboratórios
           </button>
-          <<buttonbutton
+          <button
             onClick={() => setActiveTab('equipamentos')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
               activeTab === 'equipamentos'
@@ -38,11 +38,11 @@ export default function ReservasPage() {
         </div>
       </div>
 
-      <<divdiv className="mt-6">
+      <div className="mt-6">
         {activeTab === 'locais' ? (
-          <<ReservReservasLocaisView />
+          <ReservasLocaisView />
         ) : (
-          <<ReservReservasEquipamentosView />
+          <ReservasEquipamentosView />
         )}
       </div>
     </div>

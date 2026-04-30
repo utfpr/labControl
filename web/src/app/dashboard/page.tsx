@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 
 export default function DashboardPage() {
-  const [eqStats, setEqStats] = useState({ normal: 0, manutencao: 0, quebrado: 0 });
+  const [eqStats, setEqStats] = useState({ normal: 0, em_manutencao: 0, quebrado: 0 });
   const [resEqStats, setResEqStats] = useState({ confirmadas: 0, pendentes: 0 });
   const [resLocStats, setResLocStats] = useState({ confirmadas: 0, pendentes: 0 });
   const [aulaStats, setAulaStats] = useState({ confirmadas: 0, canceladas: 0 });
@@ -143,7 +143,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-emerald-800 font-medium">Normais</p>
               </div>
               <div className="bg-amber-50 rounded-lg p-2 border border-amber-100">
-                <p className="text-2xl font-bold text-amber-600">{eqStats.manutencao}</p>
+                <p className="text-2xl font-bold text-amber-600">{eqStats.em_manutencao}</p>
                 <p className="text-xs text-amber-800 font-medium">Manutenção</p>
               </div>
               <div className="bg-rose-50 rounded-lg p-2 border border-rose-100">

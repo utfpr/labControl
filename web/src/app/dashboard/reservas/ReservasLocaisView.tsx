@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import ModalNovaReservaLocal from "../reservas-locais/ModalNovaReservaLocal";
 
 export function ReservasLocaisView() {
-  const [reservas, setReservas] = useState<<anyany[]>([]);
+  const [reservas, setReservas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
-  const [userRole, setUserRole] = useState<<stringstring>("");
+  const [userRole, setUserRole] = useState<string>("");
 
   const router = useRouter();
 
@@ -65,81 +65,80 @@ export function ReservasLocaisView() {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<<stringstring, JSX.Element> = {
-      'pendente': <<spanspan className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200"><<ClockClock className="w-3 h-3"/> Pendente</span>,
-      'aprovada': <<spanspan className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"><<CheckCheckCircle className="w-3 h-3"/> Aprovada</span>,
-      'rejeitada': <<spanspan className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200"><<XXCircle className="w-3 h-3"/> Rejeitada</span>,
-      'cancelada': <<spanspan className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-300"><<XXCircle className="w-3 h-3"/> Cancelada</span>,
-      'finalizada': <<spanspan className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"><<CheckCheckSquare className="w-3 h-3"/> Finalizada</span>,
+    const badges: Record<string, JSX.Element> = {
+      'pendente': <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200"><Clock className="w-3 h-3"/> Pendente</span>,
+      'aprovada': <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"><CheckCircle className="w-3 h-3"/> Aprovada</span>,
+      'rejeitada': <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200"><XCircle className="w-3 h-3"/> Rejeitada</span>,
+      'cancelada': <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-300"><XCircle className="w-3 h-3"/> Cancelada</span>,
+      'finalizada': <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"><CheckSquare className="w-3 h-3"/> Finalizada</span>,
     };
     return badges[status] || <span>{status}</span>;
   };
 
   return (
-    <<divdiv className="max-w-7xl mx-auto space-y-6">
-      <<divdiv className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <<hh1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-          <<CalendarCalendarRange className="w-6 h-6 text-indigo-500" /> Reservas de Laboratórios
+    <div className="max-w-7xl mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+          <CalendarRange className="w-6 h-6 text-indigo-500" /> Reservas de Laboratórios
         </h1>
-        <<buttonbutton onClick={() => setModalAberto(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-          <<PlusPlus className="w-5 h-5" /> Nova Reserva
+        <button onClick={() => setModalAberto(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+          <Plus className="w-5 h-5" /> Nova Reserva
         </button>
       </div>
 
-      <<divdiv className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
         {loading ? (
-           <<divdiv className="p-12 text-center text-slate-500"><<divdiv className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>Carregando...</div>
+           <div className="p-12 text-center text-slate-500"><div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>Carregando...</div>
         ) : erro ? (
-          <<divdiv className="p-8 text-center text-red-500 flex flex-col items-center"><<AlertAlertCircle className="w-10 h-10 mb-2 opacity-50" />{erro}</div>
+          <div className="p-8 text-center text-red-500 flex flex-col items-center"><AlertCircle className="w-10 h-10 mb-2 opacity-50" />{erro}</div>
         ) : reservas.length === 0 ? (
-          <<divdiv className="p-12 text-center text-slate-500">Nenhuma reserva encontrada.</div>
+          <div className="p-12 text-center text-slate-500">Nenhuma reserva encontrada.</div>
         ) : (
-          <<divdiv className="overflow-x-auto">
-            <<tabletable className="w-full text-left border-collapse">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 text-sm text-slate-500 uppercase tracking-wider">
-                  <<thth className="p-4 font-semibold">Laboratório / Local</th>
-                  {(userRole === 'admin' || userRole === 'supervisor') && <<thth className="p-4 font-semibold">Solicitante</th>}
-                  <<thth className="p-4 font-semibold">Início</th>
-                  <<thth className="p-4 font-semibold">Fim</th>
-                  <<thth className="p-4 font-semibold">Status</th>
-                  <<thth className="p-4 font-semibold text-right">Ações</th>
+                  <th className="p-4 font-semibold">Laboratório / Local</th>
+                  {(userRole === 'admin' || userRole === 'supervisor') && <th className="p-4 font-semibold">Solicitante</th>}
+                  <th className="p-4 font-semibold">Início</th>
+                  <th className="p-4 font-semibold">Fim</th>
+                  <th className="p-4 font-semibold">Status</th>
+                  <th className="p-4 font-semibold text-right">Ações</th>
                 </tr>
               </thead>
-              <<tbodytbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {reservas.map((r) => (
-                  <<trtr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <<tdtd className="p-4 text-sm font-semibold text-slate-800 dark:text-white">
+                  <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="p-4 text-sm font-semibold text-slate-800 dark:text-white">
                       {r.local?.nome}
                     </td>
 
                     {(userRole === 'admin' || userRole === 'supervisor') && (
-                      <<tdtd className="p-4 text-sm text-slate-600 dark:text-slate-300">{r.solicitante?.nome}</td>
+                      <td className="p-4 text-sm text-slate-600 dark:text-slate-300">{r.solicitante?.nome}</td>
                     )}
 
-                    <<tdtd className="p-4 text-sm text-slate-600 dark:text-slate-300">
+                    <td className="p-4 text-sm text-slate-600 dark:text-slate-300">
                       {new Date(r.dataHoraInicio).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
                     </td>
-                    <<tdtd className="p-4 text-sm text-slate-600 dark:text-slate-300">
+                    <td className="p-4 text-sm text-slate-600 dark:text-slate-300">
                       {new Date(r.dataHoraFim).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
                     </td>
-                    <<tdtd className="p-4">{getStatusBadge(r.status)}</td>
-                    <<tdtd className="p-4 text-right">
-                      <<divdiv className="flex items-center justify-end gap-2">
+                    <td className="p-4">{getStatusBadge(r.status)}</td>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
                         {/* Ações do Gestor */}
                         {(userRole === 'admin' || userRole === 'supervisor') && r.status === 'pendente' && (
                           <>
-                            <<buttonbutton onClick={() => alterarStatus(r.id, 'aprovar')} className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded" title="Aprovar"><<CheckCheckCircle className="w-5 h-5" /></button>
-                            <<buttonbutton onClick={() => alterarStatus(r.id, 'rejeitar')} className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded" title="Rejeitar"><<XXCircle className="w-5 h-5" /></button>
+                            <button onClick={() => alterarStatus(r.id, 'aprovar')} className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded" title="Aprovar"><CheckCircle className="w-5 h-5" /></button>
+                            <button onClick={() => alterarStatus(r.id, 'rejeitar')} className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded" title="Rejeitar"><XCircle className="w-5 h-5" /></button>
                           </>
                         )}
                         {(userRole === 'admin' || userRole === 'supervisor') && r.status === 'aprovada' && (
-                          <<buttonbutton onClick={() => alterarStatus(r.id, 'finalizar')} className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded" title="Finalizar Uso"><<CheckCheckSquare className="w-5 h-5" /></button>
+                          <button onClick={() => alterarStatus(r.id, 'finalizar')} className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded" title="Finalizar Uso"><CheckSquare className="w-5 h-5" /></button>
                         )}
 
-                        {/* Ação do Aluno */}
                         {userRole === 'comum' && r.status === 'pendente' && (
-                          <<buttonbutton onClick={() => alterarStatus(r.id, 'cancelar')} className="text-xs text-red-600 font-medium hover:underline">Cancelar</button>
+                          <button onClick={() => alterarStatus(r.id, 'cancelar')} className="text-xs text-red-600 font-medium hover:underline">Cancelar</button>
                         )}
                       </div>
                     </td>
@@ -151,7 +150,7 @@ export function ReservasLocaisView() {
         )}
       </div>
 
-      <<ModalModalNovaReservaLocal
+      <ModalNovaReservaLocal
         isOpen={modalAberto}
         onClose={() => setModalAberto(false)}
         onSuccess={() => { setModalAberto(false); buscarReservas(); }}
