@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Equipamento } from '../entities/equipamento.entity';
+import { EquipamentoStatus } from '../../common/enums';
 
 @Injectable()
 export class EquipamentosService {
@@ -86,9 +87,9 @@ export class EquipamentosService {
 
     const stats = { normal: 0, manutencao: 0, quebrado: 0 };
     statusCounts.forEach((row: any) => {
-      if (row.status === 'normal') stats.normal = Number(row.count);
-      if (row.status === 'manutencao') stats.manutencao = Number(row.count);
-      if (row.status === 'quebrado') stats.quebrado = Number(row.count);
+      if (row.status === EquipamentoStatus.NORMAL) stats.normal = Number(row.count);
+      if (row.status === EquipamentoStatus.EM_MANUTENCAO) stats.manutencao = Number(row.count);
+      if (row.status === EquipamentoStatus.QUEBRADO) stats.quebrado = Number(row.count);
     });
 
     return stats;
